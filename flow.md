@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
     A[Početni ekran] --> B{Odaberi svijet}
     B -->|Svijet brojeva| C[Mini igre: Brojanje, Zbrajanje, Uspoređivanje]
