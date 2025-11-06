@@ -1,7 +1,6 @@
 ```mermaid
 flowchart TD
-    A[Početni ekran] --> B[Nastavi]
-    B --> C{Odabir svijeta}
+    A[Početni ekran] --> C{Odabir svijeta}
     C -->|Svijet brojeva| D[Mini igre: Brojanje, Zbrajanje, Uspoređivanje]
     C -->|Zemlja misli| E[Mini igre: Pamćenje, Prepoznavanje uzorka]
     D --> F[Ekran s pohvalama i bodovima]
