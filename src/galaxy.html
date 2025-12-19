@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaksija misli</title>
+
+    <!-- OpenDyslexic font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic.min.css">
+
+    <style>
+        :root {
+            --space-bg: #020205;
+            /* Duboka crna svemirska boja */
+            --glow: #a29bfe;
+            --glass-bg: rgba(15, 15, 25, 0.8);
+            --text-color: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body,
+        html {
+            height: 100%;
+            width: 100%;
+            font-family: 'OpenDyslexic', sans-serif;
+            background-color: var(--space-bg);
+            color: var(--text-color);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- 3D GALAXY CANVAS --- */
+        .webgl {
+            position: fixed;
+            top: 0;
+            left: 0;
+            outline: none;
+            z-index: 1;
+        }
+
+        /* --- CONTENT LAYER --- */
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: clamp(2.2rem, 8vw, 4rem);
+            color: #ffffff;
+            text-shadow: 0 0 30px rgba(162, 155, 254, 0.8);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        /* Glassmorphism kutija prilagođena za disleksiju */
+        .mission-box {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 50px 40px;
+            border-radius: 40px;
+            border: 2px solid rgba(162, 155, 254, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .mission-box h3 {
+            font-size: 2rem;
+            margin-top: 25px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .mission-box p {
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.95);
+            line-height: 1.8;
+            /* Povećan razmak linija za lakše čitanje */
+            margin-top: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .rocket {
+            font-size: 6rem;
+            display: inline-block;
+            filter: drop-shadow(0 0 20px var(--glow));
+            animation: float-rocket 4s ease-in-out infinite;
+        }
+
+        @keyframes float-rocket {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(-8deg);
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(5deg);
+            }
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .mission-box {
+                padding: 30px 20px;
+            }
+
+            header h1 {
+                font-size: 2.2rem;
+            }
+
+            .mission-box h3 {
+                font-size: 1.5rem;
+            }
+
+            .mission-box p {
+                font-size: 1.2rem;
+            }
+
+            .rocket {
+                font-size: 4.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation Buttons -->
+    <div style="position: absolute; top: 15px; left: 15px; z-index: 100; display: flex; gap: 10px; flex-wrap: wrap;">
+        <a href="index.html"
+            style="text-decoration: none; font-size: 1rem; background: rgba(255, 255, 255, 0.1); padding: 8px 15px; border-radius: 30px; border: 1px solid #7b68ee; color: #7b68ee; transition: 0.2s; box-shadow: 0 0 10px rgba(123, 104, 238, 0.2); font-weight: bold;"
+            onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
+            🏠 POČETNA
+        </a>
+        <a href="choice.html"
+            style="text-decoration: none; font-size: 1rem; background: rgba(255, 255, 255, 0.1); padding: 8px 15px; border-radius: 30px; border: 1px solid #7b68ee; color: #7b68ee; transition: 0.2s; box-shadow: 0 0 10px rgba(123, 104, 238, 0.2); font-weight: bold;"
+            onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
+            🗺️ IZABERI DESTINACIJU
+        </a>
+    </div>
+
+    <!-- Jedini pozadinski element je 3D Galaksija -->
+    <canvas class="webgl"></canvas>
+
+    <div class="content-wrapper">
+        <header>
+            <h1>Galaksija misli</h1>
+        </header>
+
+        <section class="mission-box">
+            <div class="rocket">🚀</div>
+            <h3>Pripremamo lansirnu rampu...</h3>
+            <p>Igre stižu uskoro. Pripremi svoje svemirsko odijelo!</p>
+        </section>
+    </div>
+
+    <!-- JavaScript: Three.js Galaxy Animation -->
+    <script type="module">
+        import * as THREE from "https://cdn.skypack.dev/three@0.132.2";
+
+
+        const canvas = document.querySelector('canvas.webgl')
+        const scene = new THREE.Scene()
+
+        // Postavke tvoje galaksije
+        const parameters = {
+            count: 100000,
+            size: 0.01,
+            radius: 5,
+            branches: 3,
+            spin: 3,
+            randomness: 0.5,
+            randomnessPower: 3,
+            insideColor: '#ff6030',
+            outsideColor: '#1b49f0'
+        }
+
+        let geometry = null
+        let material = null
+        let points = null
+
+        const generateGalaxy = () => {
+            if (points !== null) {
+                geometry.dispose()
+                material.dispose()
+                scene.remove(points)
+            }
+
+            geometry = new THREE.BufferGeometry()
+            const positions = new Float32Array(parameters.count * 3)
+            const colors = new Float32Array(parameters.count * 3)
+            const colorInside = new THREE.Color(parameters.insideColor)
+            const colorOutside = new THREE.Color(parameters.outsideColor)
+
+            for (let i = 0; i < parameters.count; i++) {
+                const i3 = i * 3
+                const radius = Math.random() * parameters.radius
+                const spinAngle = radius * parameters.spin
+                const branchAngle = (i % parameters.branches) / parameters.branches * Math.PI * 2
+
+                const randomX = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius
+                const randomY = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius
+                const randomZ = Math.pow(Math.random(), parameters.randomnessPower) * (Math.random() < 0.5 ? 1 : -1) * parameters.randomness * radius
+
+                positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX
+                positions[i3 + 1] = randomY
+                positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ
+
+                const mixedColor = colorInside.clone()
+                mixedColor.lerp(colorOutside, radius / parameters.radius)
+                colors[i3] = mixedColor.r
+                colors[i3 + 1] = mixedColor.g
+                colors[i3 + 2] = mixedColor.b
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+
+            material = new THREE.PointsMaterial({
+                size: parameters.size,
+                sizeAttenuation: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending,
+                vertexColors: true
+            })
+
+            points = new THREE.Points(geometry, material)
+            scene.add(points)
+        }
+
+        generateGalaxy()
+
+        const sizes = { width: window.innerWidth, height: window.innerHeight }
+
+        window.addEventListener('resize', () => {
+            sizes.width = window.innerWidth
+            sizes.height = window.innerHeight
+            camera.aspect = sizes.width / sizes.height
+            camera.updateProjectionMatrix()
+            renderer.setSize(sizes.width, sizes.height)
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+        })
+
+        const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
+        camera.position.set(4, 4, 5)
+        scene.add(camera)
+        camera.lookAt(0, 0, 0)
+
+
+
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true })
+        renderer.setSize(sizes.width, sizes.height)
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+        const clock = new THREE.Clock()
+
+        const tick = () => {
+            const elapsedTime = clock.getElapsedTime()
+
+            // Lagana rotacija galaksije
+            points.rotation.y = elapsedTime * 0.1
+
+
+            renderer.render(scene, camera)
+            window.requestAnimationFrame(tick)
+        }
+
+        tick()
+    </script>
+</body>
+
+</html>
