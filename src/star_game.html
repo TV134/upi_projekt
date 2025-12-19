@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Skupljač zvijezda</title>
+    <style>
+        /* POZADINA - Zvjezdano nebo */
+        body {
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+            color: #ffffff;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+            min-height: 100vh;
+            /* Allow scrolling if needed, but fill screen */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Center vertically on big screens */
+            gap: 15px;
+            /* Space between elements to prevent clipping */
+            box-sizing: border-box;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        .naslov-igre {
+            color: #00d2ff;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            /* Responsive font */
+            text-shadow: 0 0 15px #00d2ff;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        /* UPUTE */
+        .upute-okvir {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 2px solid #00d2ff;
+            border-radius: 20px;
+            padding: 10px 20px;
+            max-width: 90%;
+            width: 600px;
+            font-size: clamp(0.9rem, 3vw, 1.1rem);
+        }
+
+        /* CILJNI BROJ */
+        .cilj-tekst {
+            font-size: clamp(1.5rem, 4vw, 2.2rem);
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            /* Wrap on tiny screens */
+        }
+
+        .broj-okvir {
+            background: #f1c40f;
+            color: #000;
+            padding: 5px 25px;
+            border-radius: 15px;
+            font-weight: bold;
+            box-shadow: 0 0 15px #f1c40f;
+        }
+
+        /* KUTIJA */
+        #kutija {
+            width: 90%;
+            max-width: 600px;
+            min-height: 200px;
+            /* Remove rigid heights to prevent collision */
+            flex-grow: 1;
+            max-height: 50vh;
+            /* Cap it but allow scroll */
+
+            border: 4px solid #00d2ff;
+            background: rgba(0, 210, 255, 0.05);
+            border-radius: 30px;
+            margin: 0;
+            padding: 10px;
+
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            align-content: flex-start;
+            /* Stars stack from top */
+            gap: 5px;
+
+            box-shadow: inset 0 0 30px rgba(0, 210, 255, 0.3);
+            transition: 0.4s;
+            overflow-y: auto;
+        }
+
+        #kutija::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #kutija::-webkit-scrollbar-thumb {
+            background: rgba(0, 210, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .star {
+            font-size: clamp(40px, 8vw, 55px);
+            /* Responsive star size */
+            margin: 5px;
+            cursor: pointer;
+            filter: drop-shadow(0 0 10px gold);
+            user-select: none;
+            transition: transform 0.1s;
+        }
+
+        .star:active {
+            transform: scale(0.9);
+        }
+
+        .kontrole {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        /* DODAVANJE ZVIJEZDE */
+        .dodaj-zvijezdu-gumb {
+            background: rgba(255, 255, 255, 0.1);
+            border: 4px solid #f1c40f;
+            border-radius: 50%;
+            width: clamp(60px, 15vw, 80px);
+            height: clamp(60px, 15vw, 80px);
+            font-size: clamp(30px, 8vw, 45px);
+            cursor: pointer;
+            color: #f1c40f;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dodaj-zvijezdu-gumb:hover {
+            transform: scale(1.1);
+        }
+
+        /* GUMB PROVJERI */
+        .gumb-provjeri {
+            padding: 15px 40px;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: #2ecc71;
+            color: white;
+            box-shadow: 0 6px 0 #27ae60;
+            text-transform: uppercase;
+        }
+
+        .gumb-provjeri:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .gumb-provjeri:disabled {
+            background: #95a5a6;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        #poruka {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            min-height: 40px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* RESPONSIVNOST (Mobile & Tablet) */
+        @media (max-width: 768px) {
+            body {
+                justify-content: flex-start;
+                /* Stack from top on mobile */
+                padding: 15px;
+                min-height: 100vh;
+                height: auto;
+            }
+
+            #kutija {
+                min-height: 150px;
+                flex-grow: 0;
+                /* Don't force growth on mobile, let content dictate */
+                height: auto;
+            }
+
+            .kontrole {
+                flex-direction: row;
+                /* Side by side buttons on mobile to save vertical space */
+                justify-content: center;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .gumb-provjeri {
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <!-- Povratak Button -->
+    <a href="planet.html"
+        style="position: absolute; top: 15px; left: 15px; text-decoration: none; font-size: 1.2rem; background: rgba(255, 255, 255, 0.1); padding: 10px 20px; border-radius: 30px; border: 2px solid #00d2ff; color: #00d2ff; transition: 0.2s; box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); z-index: 100; font-weight: bold; font-family: 'Comic Sans MS', 'Arial', sans-serif;"
+        onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
+        onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
+        ⬅ POVRATAK
+    </a>
+
+    <h1 class="naslov-igre">SKUPLJAČ ZVIJEZDA</h1>
+
+    <div class="upute-okvir">
+        Stavi zvijezde u kutiju. Kada si gotov, klikni <b>PROVJERI</b>.
+    </div>
+
+    <div class="cilj-tekst">
+        Stavi ovoliko zvijezda: <span class="broj-okvir" id="cilj">?</span>
+    </div>
+
+    <div id="kutija"></div>
+
+    <div class="kontrole">
+        <button class="dodaj-zvijezdu-gumb" id="btn-add" onclick="dodajZvijezdu()">⭐</button>
+        <p style="color: #f1c40f; font-weight: bold;">DODAJ ZVIJEZDU</p>
+
+        <button class="gumb-provjeri" id="btn-check" onclick="provjeri()">PROVJERI</button>
+    </div>
+
+    <div id="poruka"></div>
+
+    <script>
+        let brojUKutiji = 0;
+        let ciljniBroj = 0;
+
+        // Adaptivne postavke
+        let minBroj = 2;
+        let maxBroj = 4; // Krećemo od jako malih brojeva
+
+        noviZadatak();
+
+        function noviZadatak() {
+            // Odaberi broj unutar granica
+            ciljniBroj = Math.floor(Math.random() * (maxBroj - minBroj + 1)) + minBroj;
+            document.getElementById('cilj').innerText = ciljniBroj;
+
+            // Resetiraj sučelje
+            brojUKutiji = 0;
+            document.getElementById('kutija').innerHTML = "";
+            document.getElementById('poruka').innerText = "";
+            document.getElementById('kutija').style.borderColor = "#00d2ff";
+            document.getElementById('kutija').style.boxShadow = "inset 0 0 30px rgba(0, 210, 255, 0.3)";
+
+            // Omogući gumbe
+            document.getElementById('btn-check').disabled = false;
+            document.getElementById('btn-add').disabled = false;
+        }
+
+        function dodajZvijezdu() {
+            if (brojUKutiji < 20) {
+                brojUKutiji++;
+                const kutija = document.getElementById('kutija');
+                const zvijezda = document.createElement('span');
+                zvijezda.className = 'star';
+                zvijezda.innerHTML = '⭐';
+
+                // Micanje zvijezde na klik
+                zvijezda.onclick = function () {
+                    if (document.getElementById('btn-check').disabled) return;
+                    zvijezda.remove();
+                    brojUKutiji--;
+                    document.getElementById('poruka').innerText = "";
+                };
+
+                kutija.appendChild(zvijezda);
+                document.getElementById('poruka').innerText = "";
+            }
+        }
+
+        function provjeri() {
+            const poruka = document.getElementById('poruka');
+            const kutija = document.getElementById('kutija');
+            const btnCheck = document.getElementById('btn-check');
+            const btnAdd = document.getElementById('btn-add');
+
+            if (brojUKutiji === ciljniBroj) {
+                // TOČAN ODGOVOR
+                poruka.innerHTML = "🌟 TOČNO! Bravo! 🌟";
+                poruka.style.color = "#2ecc71";
+                kutija.style.borderColor = "#2ecc71";
+                kutija.style.boxShadow = "0 0 40px #2ecc71";
+
+                // Onemogući klikanje dok se ne stvori novi zadatak
+                btnCheck.disabled = true;
+                btnAdd.disabled = true;
+
+                // POVEĆAJ TEŽINU (Adaptacija)
+                if (maxBroj < 15) maxBroj++;
+
+                // Automatski novi zadatak nakon 2 sekunde
+                setTimeout(noviZadatak, 2000);
+
+            } else {
+                // NETOČAN ODGOVOR
+                if (brojUKutiji < ciljniBroj) {
+                    poruka.innerHTML = "Fali ti još zvijezda. ✨";
+                } else {
+                    poruka.innerHTML = "Imaš previše. Makni koju. 🚀";
+                }
+                poruka.style.color = "#f1c40f";
+                kutija.style.borderColor = "#e74c3c";
+
+                // SMANJI TEŽINU (da djetetu bude lakše ako zapne)
+                if (maxBroj > 4) maxBroj--;
+            }
+        }
+    </script>
+
+</body>
+
+</html>
