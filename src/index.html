@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Misija: MateSfera</title>
+    <style>
+        /* Font Lexend */
+        /* --- 1. FONTOVI (Prijateljski za disleksiju) --- */
+        @font-face {
+            font-family: 'OpenDyslexic';
+            src: url('https://cdn.jsdelivr.net/npm/opendyslexic@2/open-dyslexic-regular.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* --- GLOBALNO --- */
+        * {
+            box-sizing: border-box;
+            /* Fixes button overflow */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif;
+
+            /* Darker, deep space blue */
+            background: radial-gradient(circle at center, #192a56 0%, #0c1021 100%);
+
+            height: 100vh;
+            height: 100dvh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        /* --- 3. POZADINA (Padajuće zvijezde) --- */
+        .stars {
+            position: fixed;
+            /* Fixed to cover screen */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            /* Double height for scrolling effect */
+            pointer-events: none;
+            background: transparent;
+
+            /* Generating stars using gradients */
+            background-image:
+                radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 3px),
+                radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 3px);
+            background-size: 550px 550px, 350px 350px;
+
+            animation: moveStars 100s linear infinite;
+            z-index: 0;
+        }
+
+        /* --- GLAVNI KONTEJNER (Prozor) --- */
+        .app-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px 25px 35px 25px;
+            box-sizing: border-box;
+
+            /* Glassmorphism iz choice.html */
+            background: rgba(255, 255, 255, 0.15);
+            /* Slightly lighter glass */
+            backdrop-filter: blur(12px);
+            border: 3px solid rgba(255, 255, 255, 0.25);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .app-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --- SADRŽAJ --- */
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        /* --- DESKTOP I TABLET PRILAGODBA --- */
+        @media (min-width: 768px) {
+            .app-container {
+                width: 85%;
+                max-width: 850px !important;
+                padding: 50px;
+                background: rgba(255, 255, 255, 0.15) !important;
+                /* Force glass */
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+                justify-content: center;
+                overflow-y: visible;
+            }
+
+            .content-wrapper {
+                flex-direction: row !important;
+                justify-content: space-between;
+                align-items: center;
+                gap: 40px;
+                margin-bottom: 0;
+            }
+
+            .header {
+                text-align: left !important;
+                flex: 1.2;
+            }
+
+            .title {
+                font-size: 3rem !important;
+                text-align: left;
+            }
+
+            .mission-text-box {
+                max-height: none !important;
+                font-size: 1rem !important;
+                background: rgba(255, 255, 255, 0.1) !important;
+                border: none !important;
+            }
+
+            .visual-side {
+                flex: 0.8;
+                display: flex;
+                flex-direction: column;
+                /* Raketa iznad gumba na desnoj strani */
+                justify-content: center;
+                align-items: center;
+            }
+
+            .rocket-svg {
+                width: 200px !important;
+                margin: 0 0 30px 0 !important;
+            }
+
+            .btn-launch {
+                max-width: 350px;
+                font-size: 1.6rem !important;
+                padding: 22px !important;
+                margin-top: 0 !important;
+            }
+        }
+
+        /* --- STILOVI ELEMENATA --- */
+
+        .header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            color: #ffd700;
+            /* Matching choice.html H1 */
+            text-shadow: 2px 2px 0 #333;
+            margin: 0 0 10px 0;
+            line-height: 1.1;
+        }
+
+        .mission-text-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 15px;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+
+            max-height: 180px;
+            overflow-y: auto;
+            box-shadow: none;
+        }
+
+        .mission-text-box p {
+            margin: 0 0 8px 0;
+        }
+
+        .mission-text-box strong {
+            color: #7bed9f;
+        }
+
+        /* Using choice.html styles for visual-side and svg if needed, but they are generic. 
+           Keeping SVG styles as is but ensuring they fit */
+
+        .visual-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            /* overflow: visible; - Important for animation not being cut off */
+        }
+
+        .rocket-svg {
+            width: 70px;
+            height: auto;
+            animation: float 3s ease-in-out infinite, rumble 0.2s linear infinite;
+            filter: drop-shadow(0 15px 20px rgba(0, 0, 0, 0.4));
+            margin: 10px 0;
+            overflow: visible;
+            flex-shrink: 0;
+        }
+
+        @keyframes rumble {
+            0% {
+                margin-left: -1px;
+            }
+
+            50% {
+                margin-left: 1px;
+            }
+        }
+
+        .flame {
+            transform-origin: center top;
+            animation: flicker 0.1s infinite alternate;
+        }
+
+        @keyframes flicker {
+            from {
+                transform: scaleY(1);
+                opacity: 0.8;
+            }
+
+            to {
+                transform: scaleY(1.3);
+                opacity: 1;
+            }
+        }
+
+        .btn-launch {
+            background: linear-gradient(to bottom, #ff6b81, #ff4757);
+            color: white;
+            width: 100%;
+            /* Fixed dimensions to prevent layout shift */
+            height: 65px;
+            padding: 0 18px;
+            /* Use horizontal padding only, height handles vertical */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+
+            border: none;
+            border-radius: 50px;
+            font-family: 'OpenDyslexic', sans-serif;
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            /* Reduced to fit text better */
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.4);
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+            position: relative;
+            top: 0;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-launch:active {
+            top: 4px;
+            box-shadow: 0 2px 5px rgba(255, 71, 87, 0.4);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="stars"></div>
+
+    <div class="app-container">
+
+        <div class="content-wrapper">
+            <!-- LIJEVA STRANA / GORNJI DIO -->
+            <div class="header">
+                <h1 class="title">Misija:<br>MateSfera</h1>
+
+                <div class="mission-text-box">
+                    <p><strong>Dobrodošao u MateSferu!</strong> 👨‍🚀</p>
+                    <p>Tvoja misija počinje sada. Biraš gdje želiš započeti:</p>
+                    <p>🪐 <strong>Planet brojeva:</strong> zadaci brojanja i zbrajanja.</p>
+                    <p>🌌 <strong>Galaksija misli:</strong> izazovi za pamćenje i logiku.</p>
+                    <p style="margin-bottom: 0;">Započni misiju učenja!</p>
+                </div>
+            </div>
+
+            <!-- DESNA STRANA / SREDNJI DIO -->
+            <div class="visual-side">
+                <svg class="rocket-svg" viewBox="0 0 100 250">
+                    <path class="flame" d="M35 150 Q50 190 65 150 L50 140 Z" fill="#fbc531" />
+                    <path class="flame" d="M40 150 Q50 180 60 150 L50 140 Z" fill="#e84118"
+                        style="animation-delay: 0.05s;" />
+                    <path d="M20 120 L10 150 L35 140 Z" fill="#c23616" stroke="#2f3640" stroke-width="2" />
+                    <path d="M80 120 L90 150 L65 140 Z" fill="#c23616" stroke="#2f3640" stroke-width="2" />
+                    <ellipse cx="50" cy="90" rx="30" ry="60" fill="#ecf0f1" stroke="#2f3640" stroke-width="2" />
+                    <path d="M26 60 Q50 10 74 60 Z" fill="#e84118" stroke="#2f3640" stroke-width="2" />
+                    <circle cx="50" cy="80" r="15" fill="#00a8ff" stroke="#2f3640" stroke-width="2" />
+                    <circle cx="55" cy="75" r="4" fill="white" opacity="0.6" />
+                    <circle cx="50" cy="110" r="2" fill="#bdc3c7" />
+                    <circle cx="50" cy="125" r="2" fill="#bdc3c7" />
+                </svg>
+
+                <button class="btn-launch" id="launchBtn">
+                    LANSIRAJ 🚀
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('launchBtn');
+
+            if (btn) {
+                // Handle both click and touchstart for better responsiveness on mobile
+                // Use a flag to prevent double-firing
+                let isLaunching = false;
+
+                const handleLaunch = function (e) {
+                    if (e.type === 'touchstart') {
+                        e.preventDefault(); // Prevent ghost clicks
+                    }
+
+                    if (isLaunching) return;
+
+                    launchSequence(btn);
+                    isLaunching = true;
+
+                    // Reset flag when animation is conceptually done (after 4.4s approx)
+                    // 3 * 800ms = 2400ms + 2000ms timeout = 4400ms
+                    setTimeout(() => {
+                        isLaunching = false;
+                    }, 4500);
+                };
+
+                btn.addEventListener('click', handleLaunch);
+                btn.addEventListener('touchstart', handleLaunch, { passive: false });
+            }
+        });
+
+        function launchSequence(btn) {
+            let count = 3;
+
+            btn.style.pointerEvents = "none";
+            btn.style.background = "#44bd32";
+            btn.style.boxShadow = "0 6px 0 #218c74";
+            btn.innerHTML = "3...";
+
+            const timer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    btn.innerHTML = count + "...";
+                } else {
+                    clearInterval(timer);
+                    btn.innerHTML = "POLIJETANJE! 💨";
+
+                    setTimeout(() => {
+                        window.location.href = 'choice.html';
+                    }, 2000);
+                }
+            }, 800);
+        }
+    </script>
+</body>
+
+</html>
