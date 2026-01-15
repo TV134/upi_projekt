@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satelitska Postaja 🛰️</title>
+    <style>
+        :root {
+            --neon-blue: #00f2ff;
+            --neon-purple: #bc13fe;
+            --space-dark: #050510;
+            --success-green: #00ff88;
+            --error-red: #ff4444;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--space-dark);
+            color: white;
+            font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #galaxy-stage {
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, #161a32 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, #1a0b2e 0%, transparent 40%);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            perspective: 1000px;
+        }
+
+        /* BACK BUTTON */
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            background: rgba(26, 42, 68, 0.8);
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+            z-index: 100;
+            font-weight: bold;
+            transition: all 0.3s;
+            pointer-events: auto;
+        }
+
+        .btn-back:hover {
+            background: var(--neon-blue);
+            color: var(--space-dark);
+            box-shadow: 0 0 25px var(--neon-blue);
+            transform: scale(1.05);
+        }
+
+        /* Svjetlosna autocesta */
+        #highway {
+            position: absolute;
+            height: 20px;
+            width: 0;
+            background: linear-gradient(90deg, transparent, var(--neon-blue), var(--neon-purple), transparent);
+            box-shadow: 0 0 40px var(--neon-blue), 0 0 80px var(--neon-purple);
+            filter: blur(2px);
+            opacity: 0;
+            transition: width 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+            z-index: 1;
+        }
+
+        .planet-system {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        /* Čisti planeti bez emojija */
+        .planet-core {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #333, #000);
+            box-shadow: inset -10px -10px 20px #000, 0 0 15px rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+
+        #target-system .planet-core {
+            cursor: pointer;
+            border: 3px dashed rgba(0, 242, 255, 0.3);
+        }
+
+        #target-system .planet-core:hover {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+            transform: scale(1.05);
+        }
+
+        #target-system .planet-core:active {
+            transform: scale(0.95);
+        }
+
+        /* Orbite */
+        .orbit {
+            position: absolute;
+            border: 1px solid rgba(0, 242, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+            transition: all 0.5s ease-out;
+            z-index: 5;
+        }
+
+        /* Satelit emoji */
+        .satellite {
+            position: absolute;
+            font-size: 34px;
+            user-select: none;
+            filter: drop-shadow(0 0 10px var(--neon-blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Drži ga na rubu rotirajućeg kontejnera */
+            top: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+
+
+        .orbit-container {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: rotate 15s linear infinite;
+            z-index: 6;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* UI */
+        #ui-layer {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            z-index: 200;
+            /* Povećan z-index da ne idu priko teksta */
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .instruction {
+            color: var(--neon-blue);
+            font-size: 1.3rem;
+            margin-top: 10px;
+            text-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        /* PROVJERI BUTTON */
+        .btn-check {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
+            transition: all 0.3s;
+            pointer-events: auto;
+            z-index: 100;
+        }
+
+        .btn-check:hover {
+            transform: translateX(-50%) translateY(-5px);
+            box-shadow: 0 15px 30px rgba(188, 19, 254, 0.5);
+        }
+
+        .btn-check:active {
+            transform: translateX(-50%) translateY(2px);
+        }
+
+        .btn-check:disabled {
+            filter: grayscale(1);
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: translateX(-50%);
+        }
+
+        /* MODALS */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal {
+            background: rgba(26, 42, 68, 0.95);
+            padding: 40px;
+            border-radius: 25px;
+            border: 2px solid var(--neon-blue);
+            text-align: center;
+            max-width: 400px;
+            animation: modalIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal h2 {
+            font-size: 2.5rem;
+            margin: 0 0 15px 0;
+        }
+
+        .modal p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-modal {
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        /* Efekt pobjede */
+        .win-glow {
+            animation: win-pulse 0.5s infinite alternate;
+            border-style: solid !important;
+            border-color: var(--neon-blue) !important;
+        }
+
+        @keyframes win-pulse {
+            from {
+                box-shadow: 0 0 20px var(--neon-blue);
+                transform: scale(1);
+            }
+
+            to {
+                box-shadow: 0 0 40px var(--neon-purple);
+                transform: scale(1.05);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../planet.html" class="btn-back">⬅ POVRATAK</a>
+
+    <div id="ui-layer">
+        <h1>Satelitska Postaja</h1>
+        <div class="instruction">Pošalji isti broj satelita na tamni planet</div>
+    </div>
+
+    <div id="galaxy-stage">
+        <div id="highway"></div>
+
+        <div id="source-system" class="planet-system">
+            <div class="planet-core"
+                style="background: radial-gradient(circle at 30% 30%, #1a2a44, #000); box-shadow: inset -10px -10px 20px #000, 0 0 25px rgba(0, 242, 255, 0.3);">
+            </div>
+        </div>
+
+        <div id="target-system" class="planet-system">
+            <div id="target-core" class="planet-core" title="Klikni za dodavanje satelita"></div>
+        </div>
+    </div>
+
+    <button id="check-btn" class="btn-check" onclick="checkLogic()">PROVJERI 🚀</button>
+
+    <!-- SUCCESS MODAL -->
+    <div id="success-overlay" class="overlay">
+        <div class="modal" style="border-color: var(--success-green);">
+            <h2 style="color: var(--success-green);">TOP! 🌟</h2>
+            <p>Sateliti su savršeno usklađeni!</p>
+            <button class="btn-modal" style="background: var(--success-green); color: black;"
+                onclick="nextLevel()">DALJE ➡</button>
+        </div>
+    </div>
+
+    <!-- FAIL MODAL -->
+    <div id="fail-overlay" class="overlay">
+        <div class="modal" style="border-color: var(--error-red);">
+            <h2 style="color: var(--error-red);">UPS! 🛰️</h2>
+            <p id="fail-msg">Broj satelita se ne poklapa.</p>
+            <button class="btn-modal" style="background: var(--error-red); color: white;"
+                onclick="resetTarget()">POKUŠAJ PONOVO ↺</button>
+        </div>
+    </div>
+
+    <script>
+        const sourceSystem = document.getElementById('source-system');
+        const targetSystem = document.getElementById('target-system');
+        const targetCore = document.getElementById('target-core');
+        const highway = document.getElementById('highway');
+        const checkBtn = document.getElementById('check-btn');
+        const successOverlay = document.getElementById('success-overlay');
+        const failOverlay = document.getElementById('fail-overlay');
+
+        let requiredSatellites = 0;
+        let currentSatellites = 0;
+        let isTransitioning = false;
+
+        function refreshSatellitePositions(system, count) {
+            const containers = system.querySelectorAll('.orbit-container');
+            const orbits = system.querySelectorAll('.orbit');
+
+            containers.forEach((container, i) => {
+                const radius = 90 + (i * 30); // Malo uži radijusi da ne udaraju u tekst
+                container.style.width = `${radius * 2}px`;
+                container.style.height = `${radius * 2}px`;
+
+                if (orbits[i]) {
+                    orbits[i].style.width = `${radius * 2}px`;
+                    orbits[i].style.height = `${radius * 2}px`;
+                }
+            });
+        }
+
+        function createSatellite(system, index, total) {
+            // Vizualni prsten (skroz miran)
+            const orbit = document.createElement('div');
+            orbit.className = 'orbit';
+            system.appendChild(orbit);
+
+            // Nevidljivi container koji se vrti
+            const container = document.createElement('div');
+            container.className = 'orbit-container';
+
+            // Brzina ovisi o udaljenosti (dalji idu sporije)
+            const duration = 15 + (index * 5);
+            container.style.animationDuration = `${duration}s`;
+            // Početni kut da nisu svi u istoj liniji
+            container.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+            const satellite = document.createElement('div');
+            satellite.className = 'satellite';
+            satellite.textContent = '🛰️';
+
+            container.appendChild(satellite);
+            system.appendChild(container);
+
+            refreshSatellitePositions(system, total);
+        }
+
+        function initLevel() {
+            isTransitioning = false;
+            requiredSatellites = Math.floor(Math.random() * 6) + 1; // 1 do 6
+            currentSatellites = 0;
+            checkBtn.disabled = true;
+
+            sourceSystem.querySelectorAll('.orbit-container, .orbit').forEach(el => el.remove());
+            targetSystem.querySelectorAll('.orbit-container, .orbit').forEach(el => el.remove());
+
+            highway.style.width = '0';
+            highway.style.opacity = '0';
+            targetCore.classList.remove('win-glow');
+            targetCore.style.background = '';
+
+            successOverlay.style.display = 'none';
+            failOverlay.style.display = 'none';
+
+            for (let i = 0; i < requiredSatellites; i++) {
+                createSatellite(sourceSystem, i, requiredSatellites);
+            }
+        }
+
+        targetCore.addEventListener('click', () => {
+            if (isTransitioning) return;
+
+            if (currentSatellites < 6) { // Max 6 satelita
+                currentSatellites++;
+                createSatellite(targetSystem, currentSatellites - 1, currentSatellites);
+                checkBtn.disabled = false;
+            }
+        });
+
+        function checkLogic() {
+            if (isTransitioning) return;
+
+            if (currentSatellites === requiredSatellites) {
+                isTransitioning = true;
+                highway.style.opacity = '1';
+                highway.style.width = '45%';
+                targetCore.classList.add('win-glow');
+
+                setTimeout(() => {
+                    successOverlay.style.display = 'flex';
+                }, 1000);
+
+            } else {
+                const msg = currentSatellites > requiredSatellites ? "Previše satelita!" : "Premalo satelita!";
+                document.getElementById('fail-msg').innerText = msg;
+                failOverlay.style.display = 'flex';
+            }
+        }
+
+        function resetTarget() {
+            targetSystem.querySelectorAll('.orbit-container, .orbit').forEach(el => el.remove());
+            currentSatellites = 0;
+            checkBtn.disabled = true;
+            failOverlay.style.display = 'none';
+        }
+
+        function nextLevel() {
+            initLevel();
+        }
+
+        initLevel();
+    </script>
+
+</body>
+
+</html>
