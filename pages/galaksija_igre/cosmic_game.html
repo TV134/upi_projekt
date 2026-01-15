@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kozmička Mreža</title>
+    <style>
+        /* COSMIC THEME - Neon Soft Cyber */
+        body {
+            background: linear-gradient(135deg, #100b29 0%, #240b36 100%);
+            color: #ffffff;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Grid Background Effect */
+        body::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                linear-gradient(rgba(0, 210, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 210, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            transform: perspective(500px) rotateX(60deg);
+            animation: moveGrid 20s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes moveGrid {
+            0% {
+                transform: perspective(500px) rotateX(60deg) translateY(0);
+            }
+
+            100% {
+                transform: perspective(500px) rotateX(60deg) translateY(50px);
+            }
+        }
+
+        /* RETURN BUTTON */
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 3px solid #00d2ff;
+            color: #00d2ff;
+            transition: 0.2s;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+            z-index: 100;
+            font-weight: bold;
+        }
+
+        .btn-back:hover {
+            background: #00d2ff;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .game-title {
+            color: #ff00ff;
+            /* Neon Pink */
+            font-size: clamp(2rem, 5vw, 3rem);
+            text-shadow: 0 0 10px #ff00ff;
+            margin: 0;
+            z-index: 10;
+            letter-spacing: 2px;
+        }
+
+        .level-display {
+            font-size: 1.5rem;
+            color: #00d2ff;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 25px;
+            border-radius: 20px;
+        }
+
+        /* 3x3 GRID */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 20px;
+            border: 4px solid #00d2ff;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+            margin: 10px 0;
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .cell:hover {
+            transform: scale(1.05);
+            border-color: #fff;
+        }
+
+        .cell:active {
+            transform: scale(0.95);
+        }
+
+        /* Locked cells (pre-filled cues) */
+        .cell.locked {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            cursor: default;
+        }
+
+        .cell.locked:hover {
+            transform: none;
+        }
+
+        .cell.error {
+            animation: shake 0.4s ease-in-out;
+            border-color: #ff4444;
+            background: rgba(255, 0, 0, 0.2);
+        }
+
+        /* CHECK BUTTON */
+        .btn-check {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: #2ecc71;
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #27ae60;
+            transition: transform 0.1s;
+            font-family: inherit;
+        }
+
+        .btn-check:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #27ae60;
+        }
+
+        /* LEGEND / PALETTE (Visual cue only) */
+        .legend {
+            display: flex;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        .legend-item {
+            font-size: 2rem;
+        }
+
+        /* MODALS */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(16, 11, 41, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #fff;
+            color: #333;
+            border: 8px solid #00d2ff;
+            padding: 30px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: popIn 0.4s;
+            font-family: 'Comic Sans MS', 'Verdana', sans-serif;
+            letter-spacing: 1px;
+            line-height: 1.5;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            margin: 0 0 10px 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+        }
+
+        .modal-btn {
+            padding: 10px 30px;
+            font-size: 1.5rem;
+            background: #00d2ff;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            margin-top: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../galaxy.html" class="btn-back">⬅ POVRATAK</a>
+
+    <h1 class="game-title">KOZMIČKA MREŽA</h1>
+    <div class="level-display" id="levelDisplay">RAZINA: 1 / 10</div>
+
+    <div class="legend">
+        <!-- Visual reminder of symbols -->
+        <span class="legend-item">🔴</span>
+        <span class="legend-item">🔵</span>
+        <span class="legend-item">🟡</span>
+    </div>
+
+    <p style="margin: 5px 0; color: #ccc;">Popuni mrežu! Svaki red i stupac moraju imati sve 3 boje.</p>
+
+    <div class="grid-container" id="grid">
+        <!-- Generated by JS -->
+    </div>
+
+    <button class="btn-check" onclick="checkSolution()">PROVJERI ✅</button>
+
+    <!-- START MODAL -->
+    <div class="overlay" id="startScreen" style="display: flex;">
+        <div class="modal-card" style="max-width: 600px;">
+            <h2 style="color: #6c5ce7; font-size: 3rem; margin: 0; text-transform: uppercase;">KOZMIČKA MREŽA</h2>
+
+            <div
+                style="text-align: left; margin: 20px 0; background: rgba(108, 92, 231, 0.1); padding: 20px; border-radius: 15px; color: #333;">
+                <p style="font-size: 1.3rem; margin: 10px 0;">🕸️ <strong>MISIJA:</strong> Popuni mrežu bojama!</p>
+                <p style="font-size: 1.3rem; margin: 10px 0;">🎨 <strong>KAKO:</strong>
+                    <br>1. Klikni na polje da promijeniš znak (🔴 🔵 🟡).
+                    <br>2. Svaki red i stupac mora imati sve 3 boje.
+                    <br>3. Pazi da se ne ponavljaju!
+                </p>
+                <p style="font-size: 1.3rem; margin: 10px 0;">✨ <strong>CILJ:</strong> Riješi 10 razina da pobijediš!
+                </p>
+            </div>
+
+            <button class="modal-btn" onclick="startGame()">IGRAJ ▶</button>
+        </div>
+    </div>
+
+    <!-- WIN MODAL -->
+    <div class="overlay" id="successScreen">
+        <div class="modal-card" style="border-color: #2ecc71;">
+            <h2 class="modal-title" style="color: #2ecc71;">TOČNO!</h2>
+            <p style="font-size: 1.5rem;">Mreža je ispravno popunjena!</p>
+            <button class="modal-btn" onclick="nextLevel()" style="background: #2ecc71;">DALJE ➡</button>
+        </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="overlay" id="finalScreen">
+        <div class="modal-card" style="border-color: #ffd700;">
+            <h2 class="modal-title" style="color: #ffd700;">BRAVO! 🏆</h2>
+            <p style="font-size: 1.5rem;">Kozmička mreža je stabilna!</p>
+            <button class="modal-btn" onclick="startGame()" style="background: #ffd700; color: #333;">PONOVNO ↺</button>
+        </div>
+    </div>
+
+    <script>
+        // SYMBOLS
+        const SYMBOLS = ['🔴', '🔵', '🟡']; // 0, 1, 2
+        // Internal Grid: 3x3 array of integers (0,1,2 or null)
+        let solutionGrid = [];
+        let playerGrid = [];
+        let currentLevel = 1;
+        let lockedCells = [];
+
+        let audioCtx = null;
+        function initAudio() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume().catch(console.error);
+            } catch (e) { }
+        }
+
+        function playTone(freq, type = 'sine') {
+            if (!audioCtx) return;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.freq = freq; o.type = type;
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            o.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // --- LATIN SQUARE LOGIC ---
+        function generateLatinSquare() {
+            // Base square
+            let s = [
+                [0, 1, 2],
+                [1, 2, 0],
+                [2, 0, 1]
+            ];
+
+            // Shuffle Rows
+            s.sort(() => Math.random() - 0.5);
+
+            // Shuffle Cols (Transpose -> Shuffle -> Transpose)
+            // Or just swap cols manualy
+            if (Math.random() > 0.5) { // Swap col 0 & 1
+                for (let r = 0; r < 3; r++) [s[r][0], s[r][1]] = [s[r][1], s[r][0]];
+            }
+            if (Math.random() > 0.5) { // Swap col 1 & 2
+                for (let r = 0; r < 3; r++) [s[r][1], s[r][2]] = [s[r][2], s[r][1]];
+            }
+
+            // Map to symbols (Shuffle symbols mapping)
+            let mapping = [0, 1, 2].sort(() => Math.random() - 0.5);
+            let finalGrid = s.map(row => row.map(val => mapping[val]));
+
+            return finalGrid;
+        }
+
+        function generateLevel() {
+            document.getElementById('levelDisplay').innerText = `RAZINA: ${currentLevel} / 10`;
+            solutionGrid = generateLatinSquare();
+            playerGrid = [
+                [null, null, null],
+                [null, null, null],
+                [null, null, null]
+            ];
+
+            // Difficulty (Items removed)
+            // Lvl 1: Remove 3 items
+            // Lvl 5: Remove 5 items
+            // Lvl 10: Remove 6 items (Leave 3)
+            let itemsToRemove = 3 + Math.floor(currentLevel / 3);
+            if (itemsToRemove > 6) itemsToRemove = 6;
+
+            // Create list of all coords
+            let coords = [];
+            for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) coords.push({ r, c });
+            coords.sort(() => Math.random() - 0.5);
+
+            // Keep some, remove others
+            lockedCells = []; // Reset
+
+            // First loop: Fill player grid with solution initially
+            for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) playerGrid[r][c] = solutionGrid[r][c];
+
+            // Now remove specific ones
+            for (let i = 0; i < itemsToRemove; i++) {
+                let p = coords[i];
+                playerGrid[p.r][p.c] = null; // Empty this one
+            }
+
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const container = document.getElementById('grid');
+            container.innerHTML = '';
+
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const val = playerGrid[r][c];
+                    const div = document.createElement('div');
+                    div.className = 'cell';
+
+                    // Is this a locked cell? 
+                    // Logic: If it came from solution and wasn't removed, it's locked?
+                    // No, we need to track which ones show be locked.
+                    // Better approach: Check if it was null in "initial state". 
+                    // Actually, simple check: generated removed ones are null.
+                    // BUT re-rendering needs to know if user filled it or game filled it.
+                    // Let's deduce locked status: 
+                    // If we just generated level, we know which are null.
+                    // We need to persist "locked" status.
+                    // Let's store locked coords in `lockedCells` during generation.
+                }
+            }
+
+            // RE-DO GENERATION LOGIC TO SUPPORT LOCKING
+            // Simplified: We clear and rebuild DOM.
+        }
+
+        // --- CORRECT RENDER/STATE LOGIC ---
+        function startGame() {
+            currentLevel = 1;
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('finalScreen').style.display = 'none';
+            initAudio();
+            startLevelLogic();
+        }
+
+        function nextLevel() {
+            document.getElementById('successScreen').style.display = 'none';
+            if (currentLevel >= 10) {
+                document.getElementById('finalScreen').style.display = 'flex';
+            } else {
+                currentLevel++;
+                startLevelLogic();
+            }
+        }
+
+        function startLevelLogic() {
+            document.getElementById('levelDisplay').innerText = `RAZINA: ${currentLevel} / 10`;
+            solutionGrid = generateLatinSquare();
+
+            // Determine holes
+            let itemsToRemove = 3 + Math.floor(currentLevel / 3);
+            if (itemsToRemove > 6) itemsToRemove = 6;
+
+            let coords = [];
+            for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) coords.push({ r, c });
+            coords.sort(() => Math.random() - 0.5);
+
+            let holes = coords.slice(0, itemsToRemove); // These are empty
+            let locked = coords.slice(itemsToRemove);   // These are pre-filled
+
+            playerGrid = [[null, null, null], [null, null, null], [null, null, null]];
+            lockedCells = []; // Array of string "r-c"
+
+            // Fill locked
+            locked.forEach(p => {
+                playerGrid[p.r][p.c] = solutionGrid[p.r][p.c];
+                lockedCells.push(`${p.r}-${p.c}`);
+            });
+
+            drawGrid();
+        }
+
+        function drawGrid() {
+            const container = document.getElementById('grid');
+            container.innerHTML = '';
+
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const div = document.createElement('div');
+                    div.className = 'cell';
+                    const val = playerGrid[r][c];
+
+                    if (val !== null) div.innerText = SYMBOLS[val];
+
+                    if (lockedCells.includes(`${r}-${c}`)) {
+                        div.classList.add('locked');
+                    } else {
+                        // Interactive
+                        div.onclick = () => cycleCell(r, c);
+                    }
+                    div.id = `cell-${r}-${c}`;
+                    container.appendChild(div);
+                }
+            }
+        }
+
+        function cycleCell(r, c) {
+            let val = playerGrid[r][c];
+            if (val === null) val = 0;
+            else val = (val + 1) % 3; // 0->1->2->0
+
+            playerGrid[r][c] = val;
+
+            // Update visual ONLY (no full redraw for speed)
+            const el = document.getElementById(`cell-${r}-${c}`);
+            el.innerText = SYMBOLS[val];
+
+            // Play faint click sound
+            playTone(400, 'sine');
+        }
+
+        function checkSolution() {
+            let correct = true;
+
+            // Check against solutionGrid? 
+            // Note: Latin Squares can have multiple solutions if clues are few.
+            // But we want to enforce OUR solution or ANY valid solution?
+            // "Sudoku" usually has 1 unique solution.
+            // For simplicity/robustness, let's check basic Latin Square rules:
+            // 1. No cell empty
+            // 2. Each row unique
+            // 3. Each col unique
+
+            // 1. Empty Check
+            for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
+                if (playerGrid[r][c] === null) {
+                    highlightError(r, c);
+                    correct = false;
+                }
+            }
+            if (!correct) return; // Stop if empty cells
+
+            // 2. Row Check
+            for (let r = 0; r < 3; r++) {
+                let seen = new Set();
+                for (let c = 0; c < 3; c++) seen.add(playerGrid[r][c]);
+                if (seen.size !== 3) {
+                    correct = false;
+                    // Highlight row
+                    for (let c = 0; c < 3; c++) highlightError(r, c);
+                }
+            }
+
+            // 3. Col Check
+            for (let c = 0; c < 3; c++) {
+                let seen = new Set();
+                for (let r = 0; r < 3; r++) seen.add(playerGrid[r][c]);
+                if (seen.size !== 3) {
+                    correct = false;
+                    // Highlight col
+                    for (let r = 0; r < 3; r++) highlightError(r, c);
+                }
+            }
+
+            if (correct) {
+                playTone(600, 'square'); setTimeout(() => playTone(800, 'square'), 100);
+                document.getElementById('successScreen').style.display = 'flex';
+            } else {
+                playTone(200, 'sawtooth');
+            }
+        }
+
+        function highlightError(r, c) {
+            const el = document.getElementById(`cell-${r}-${c}`);
+            el.classList.add('error');
+            setTimeout(() => el.classList.remove('error'), 500);
+        }
+
+    </script>
+</body>
+
+</html>
