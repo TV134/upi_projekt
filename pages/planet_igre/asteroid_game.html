@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Svemirski Kristali</title>
+    <!-- OpenDyslexic font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/open-dyslexic.min.css">
+    <style>
+        :root {
+            --space-bg: #050510;
+            --planet-base: #322153;
+            --planet-dark: #1e1433;
+            --glow: #00d2ff;
+            --glass-bg: rgba(20, 15, 40, 0.7);
+            --ui-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: var(--space-bg);
+            color: white;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .universe {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 100%, #161632 0%, #050510 100%);
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/123163/stars.png') repeat;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            width: 95%;
+            height: 90vh;
+            margin-top: 5vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header-bar {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--glow);
+            text-shadow: 0 0 15px var(--glow);
+            text-align: center;
+        }
+
+        .btn {
+            background: var(--ui-bg);
+            border: 1px solid rgba(0, 210, 255, 0.5);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-family: inherit;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background: rgba(0, 210, 255, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        }
+
+        .game-frame {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            border: 2px solid rgba(0, 210, 255, 0.3);
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 0 30px rgba(0, 210, 255, 0.1), 0 0 20px rgba(0, 210, 255, 0.1);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* UI unutar igre */
+        #game-ui {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+            width: 100%;
+        }
+
+        .level-label {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--glow);
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        .battery {
+            display: flex;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .slot {
+            width: 25px;
+            height: 25px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            background: #222;
+        }
+
+        .slot.filled {
+            background: var(--glow);
+            border-color: #fff;
+            box-shadow: 0 0 10px var(--glow);
+        }
+
+        /* TUTORIAL STYLES (Copied & Adapted from star_game.html) */
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            /* Hidden by default state for transition */
+            pointer-events: none;
+            /* Ignore clicks when hidden */
+            transition: opacity 0.5s;
+        }
+
+        /* State when visible */
+        .tutorial-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tutorial-box {
+            background: linear-gradient(135deg, #1e272e, #090a0f);
+            border: 4px solid #00d2ff;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 210, 255, 0.4);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .tutorial-title {
+            color: #ffd700;
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .tutorial-step {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #fff;
+        }
+
+        .tutorial-highlight {
+            color: #00d2ff;
+            font-weight: bold;
+        }
+
+        .btn-tutorial {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            box-shadow: 0 5px 0 #27ae60;
+            transition: transform 0.1s;
+        }
+
+        .btn-tutorial:hover {
+            transform: scale(1.05);
+            /* Slight hover effect */
+        }
+
+        .btn-tutorial:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #27ae60;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="universe"></div>
+    <div class="stars"></div>
+
+    <div class="content-wrapper">
+        <header class="header-bar">
+            <a href="../planet.html" class="btn">⬅ NATRAG</a>
+            <h1>Svemirski Kristali</h1>
+            <button onclick="showInstructions()" class="btn">❓ UPUTE</button>
+        </header>
+
+        <div class="game-frame" id="gameFrame">
+            <canvas id="gameCanvas"></canvas>
+
+            <div id="game-ui">
+                <div id="level-text" class="level-label">NIVO 1</div>
+                <div id="battery" class="battery"></div>
+            </div>
+
+            <!-- TUTORIAL OVERLAY -->
+            <div id="tutorial-overlay" class="tutorial-overlay">
+                <div class="tutorial-box">
+                    <h2 class="tutorial-title" id="tutorial-title">🎓 UPUTE</h2>
+                    <div id="tutorial-content">
+                        <!-- Content by JS -->
+                    </div>
+                    <div id="tutorial-controls">
+                        <button class="btn-tutorial" id="tutorial-main-btn" onclick="closeInstructions()">RAZUMIJEM!
+                            🚀</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gameFrame = document.getElementById('gameFrame');
+
+        let width, height;
+        let ship = { x: 0, y: 0, radius: 25 };
+        let asteroids = [];
+        let particles = [];
+        let currentEnergy = 0;
+        let currentLevel = 1;
+        let isPaused = true;
+        let engineFrame = 0;
+
+        // Helper to get random int between min and max (inclusive)
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Generate random targets
+        let t1 = getRandomInt(3, 6);
+        let t2 = getRandomInt(7, 10);
+        let t3 = getRandomInt(11, 15);
+
+        // Ensure strict ascending order (just in case ranges overlap, though here they don't)
+        if (t2 <= t1) t2 = t1 + 3;
+        if (t3 <= t2) t3 = t2 + 4;
+
+        const levelSettings = {
+            1: { target: t1, maxCrystals: 3, desc: `Sakupi ${t1} kristala energije!` },
+            2: { target: t2, maxCrystals: 5, desc: `Bravo! Sada nam treba ${t2} kristala.` },
+            3: { target: t3, maxCrystals: 5, desc: `Zadnja misija! Sakupi ${t3} kristala.` }
+        };
+
+        function updateUI() {
+            const settings = levelSettings[currentLevel];
+            document.getElementById('level-text').innerText = `NIVO ${currentLevel}`;
+            const batteryUI = document.getElementById('battery');
+            batteryUI.innerHTML = '';
+            for (let i = 0; i < settings.target; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot' + (i < currentEnergy ? ' filled' : '');
+                batteryUI.appendChild(slot);
+            }
+        }
+
+        // --- Overlay & Flow Functions ---
+
+        function showInstructions() {
+            const overlay = document.getElementById('tutorial-overlay');
+            const content = document.getElementById('tutorial-content');
+            const controls = document.getElementById('tutorial-controls');
+
+            document.getElementById('tutorial-title').innerText = "🎓 UPUTE";
+            content.innerHTML =
+                `<div class="tutorial-step">💎 <span class="tutorial-highlight">Misija:</span> Sakupi traženi broj kristala!</div>` +
+                `<div class="tutorial-step">🔴 <span class="tutorial-highlight" style="color: #ff4444">Asteroid pocrveni</span> = imaš previše energije.</div>` +
+                `<div class="tutorial-step">🖱️ <span class="tutorial-highlight">Kontrole:</span> Miš ili dodir za micanje.</div>`;
+
+            controls.innerHTML = `<button class="btn-tutorial" onclick="resumeGame()">NASTAVI 🚀</button>`;
+
+            overlay.classList.add('visible');
+            isPaused = true;
+        }
+
+        function closeInstructions() {
+            const overlay = document.getElementById('tutorial-overlay');
+            overlay.classList.remove('visible');
+            isPaused = false;
+        }
+
+        function startNextLevel() {
+            asteroids = [];
+            currentEnergy = 0;
+            updateUI();
+            closeInstructions();
+        }
+
+        function resumeGame() {
+            closeInstructions();
+        }
+
+        function showWinScreen() {
+            isPaused = true;
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const controls = document.getElementById('tutorial-controls');
+
+            if (currentLevel < 3) {
+                currentLevel++;
+                title.innerText = "BRAVO! 🎉";
+                content.innerHTML = `<div class="tutorial-step">${levelSettings[currentLevel].desc}</div>`;
+                controls.innerHTML = `<button class="btn-tutorial" onclick="startNextLevel()">DALJE ➡</button>`;
+            } else {
+                title.innerText = "POBJEDA! 🏆";
+                content.innerHTML = `<div class="tutorial-step">Svemir je spašen! Čestitam, astronaute!</div>`;
+                controls.innerHTML =
+                    `<button class="btn-tutorial" onclick="location.reload()">IGRAJ PONOVO 🔄</button>` +
+                    `<div style="margin-top:10px;"><button class="btn-tutorial" style="background:#7b68ee" onclick="window.location.href='../planet.html'">NATRAG ⬅</button></div>`;
+            }
+            overlay.classList.add('visible');
+        }
+
+        function resize() {
+            width = canvas.width = gameFrame.clientWidth;
+            height = canvas.height = gameFrame.clientHeight;
+            ship.y = height - 80;
+            if (ship.x > width) ship.x = width / 2;
+        }
+
+        window.addEventListener('resize', resize);
+
+        gameFrame.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            ship.x = e.clientX - rect.left;
+        });
+
+        gameFrame.addEventListener('touchmove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            ship.x = e.touches[0].clientX - rect.left;
+            e.preventDefault();
+        }, { passive: false });
+
+        class Asteroid {
+            constructor(x) {
+                this.radius = 40;
+                this.x = x;
+                this.y = -100;
+                this.speed = 2 + (currentLevel * 0.5);
+                this.value = Math.floor(Math.random() * levelSettings[currentLevel].maxCrystals) + 1;
+                this.color = '#444';
+                this.rotation = Math.random() * Math.PI * 2;
+                this.rotSpeed = (Math.random() - 0.5) * 0.05;
+                this.isWrong = false;
+                this.opacity = 1.0;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                ctx.beginPath();
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+
+                const dotR = 6;
+                ctx.fillStyle = this.color === '#ff0000' ? '#ffaa00' : '#00ffcc';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = ctx.fillStyle;
+
+                const layouts = {
+                    1: [[0, 0]],
+                    2: [[-15, 0], [15, 0]],
+                    3: [[-15, 12], [15, 12], [0, -15]],
+                    4: [[-15, -15], [15, -15], [-15, 15], [15, 15]],
+                    5: [[-18, -18], [18, -18], [-18, 18], [18, 18], [0, 0]]
+                };
+
+                if (layouts[this.value]) {
+                    layouts[this.value].forEach(p => {
+                        ctx.beginPath();
+                        ctx.arc(p[0], p[1], dotR, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                }
+
+                ctx.shadowBlur = 0;
+                ctx.restore();
+            }
+
+            update() {
+                this.y += this.speed;
+                this.rotation += this.rotSpeed;
+            }
+        }
+
+        function drawShip() {
+            ctx.save();
+            ctx.translate(ship.x, ship.y);
+
+            engineFrame += 0.5;
+            const flicker = Math.sin(engineFrame) * 5;
+
+            ctx.beginPath();
+            ctx.moveTo(-10, 20);
+            ctx.lineTo(0, 40 + flicker);
+            ctx.lineTo(10, 20);
+            ctx.fillStyle = '#ffaa00';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(-6, 20);
+            ctx.lineTo(0, 32 + flicker);
+            ctx.lineTo(6, 20);
+            ctx.fillStyle = '#ffff00';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(0, -35); // Nos
+            ctx.lineTo(25, 25); // Desno krilo
+            ctx.lineTo(0, 15);  // Rep sredina
+            ctx.lineTo(-25, 25); // Lijevo krilo
+            ctx.closePath();
+
+            const gradient = ctx.createLinearGradient(-25, 0, 25, 0);
+            gradient.addColorStop(0, '#0088ff');
+            gradient.addColorStop(0.5, '#00ccff');
+            gradient.addColorStop(1, '#0088ff');
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.ellipse(0, -5, 8, 15, 0, 0, Math.PI * 2);
+            ctx.fillStyle = '#ccffff';
+            ctx.fill();
+
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function checkCollisions() {
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                let a = asteroids[i];
+                if (a.isWrong) continue; // Ignore already hit wrong asteroids
+
+                const dx = ship.x - a.x;
+                const dy = ship.y - a.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < ship.radius + a.radius) {
+                    let maxAllowed = levelSettings[currentLevel].target;
+
+                    if (currentEnergy + a.value <= maxAllowed) {
+                        currentEnergy += a.value;
+                        asteroids.splice(i, 1);
+                        updateUI();
+
+                        if (currentEnergy === maxAllowed) {
+                            showWinScreen();
+                        }
+                    } else {
+                        // Mark as wrong, turn red, transparent
+                        a.isWrong = true;
+                        a.color = '#ff0000';
+                        a.opacity = 0.5;
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw always to show game behind overlay
+            drawShip();
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                asteroids[i].draw();
+            }
+
+            if (!isPaused) {
+                if (Math.random() < 0.015) {
+                    const newX = Math.random() * (width - 80) + 40;
+                    // Check overlap
+                    let overlapping = false;
+                    for (let a of asteroids) {
+                        if (a.y < 100 && Math.abs(a.x - newX) < 80) {
+                            overlapping = true;
+                            break;
+                        }
+                    }
+                    if (!overlapping) {
+                        asteroids.push(new Asteroid(newX));
+                    }
+                }
+
+                for (let i = asteroids.length - 1; i >= 0; i--) {
+                    asteroids[i].update();
+                    if (asteroids[i].y > height + 50) asteroids.splice(i, 1);
+                }
+                checkCollisions();
+            }
+            requestAnimationFrame(animate);
+        }
+
+        // Init
+        setTimeout(resize, 100);
+        updateUI();
+        animate();
+
+        // Initial State
+        // Show start screen
+        const overlay = document.getElementById('tutorial-overlay');
+        const content = document.getElementById('tutorial-content');
+        const controls = document.getElementById('tutorial-controls');
+
+        document.getElementById('tutorial-title').innerText = "SPREMAN?";
+        content.innerHTML =
+            `<div class="tutorial-step">💎 <span class="tutorial-highlight">Misija:</span> Sakupi kristale energije!</div>` +
+            `<div class="tutorial-step">🖱️ <span class="tutorial-highlight">Kontrole:</span> Pomakni miš.</div>`;
+
+        controls.innerHTML = `<button class="btn-tutorial" onclick="startNextLevel()">KRENI 🚀</button>`;
+        overlay.classList.add('visible');
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Misterij Titana</title>
+    <style>
+        /* TITAN THEME - Hazy Orange/Gold Atmosphere */
+        body {
+            background: linear-gradient(135deg, #2C1810 0%, #000000 100%);
+            color: #ffffff;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Ambient Fog/Haze Animation */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 165, 0, 0.1) 0%, transparent 70%);
+            animation: drift 20s infinite linear;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(-50%, -50%);
+            }
+
+            50% {
+                transform: translate(0%, 0%);
+            }
+
+            100% {
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        /* RETURN BUTTON */
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            background: rgba(255, 165, 0, 0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            transition: 0.2s;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            z-index: 100;
+            font-weight: bold;
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 165, 0, 0.3);
+            transform: scale(1.05);
+        }
+
+        .game-title {
+            color: #ffd700;
+            font-size: clamp(2rem, 5vw, 3rem);
+            text-shadow: 0 0 20px #ff8c00;
+            margin: 0;
+            z-index: 10;
+        }
+
+        .level-display {
+            font-size: 1.5rem;
+            color: #ffcc80;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* PATTERN CONTAINER */
+        .pattern-container {
+            background: rgba(0, 0, 0, 0.6);
+            border: 4px solid #ff8c00;
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 0 30px rgba(255, 140, 0, 0.2);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            width: 90%;
+            max-width: 800px;
+        }
+
+        .item-slot {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            transition: all 0.3s;
+        }
+
+        .item-slot.filled {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .item-slot.question {
+            border: 3px solid #00d2ff;
+            background: rgba(0, 210, 255, 0.1);
+            color: #00d2ff;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 210, 255, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 210, 255, 0);
+            }
+        }
+
+        /* OPTIONS CONTAINER */
+        .options-container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            border-top: 2px solid #ffd700;
+        }
+
+        .option-btn {
+            width: 90px;
+            height: 90px;
+            border: none;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #444, #000);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            font-size: 3.5rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+            border: 2px solid #ffd700;
+        }
+
+        .option-btn:active {
+            transform: scale(0.95);
+        }
+
+        .option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* FEEDBACK MESSAGE */
+        .feedback {
+            height: 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+
+        /* WIN OVERLAY */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .win-card {
+            background: #1a1a1a;
+            border: 4px solid #ffd700;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            animation: popIn 0.5s;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Animations for correct/wrong */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes successPop {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.5);
+                color: #2ecc71;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .success-anim {
+            animation: successPop 0.5s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../galaxy.html" class="btn-back">⬅ POVRATAK</a>
+
+    <h1 class="game-title">MISTERIJ TITANA</h1>
+    <div class="level-display" id="levelDisplay">RAZINA: 1 / 10</div>
+
+    <div class="feedback" id="feedbackMsg">Promotri niz i nastavi ga...</div>
+
+    <!-- PATTERN DISPLAY -->
+    <div class="pattern-container" id="patternBox">
+        <!-- Slots injected via JS -->
+    </div>
+
+    <!-- PLAYER OPTIONS -->
+    <div class="options-container" id="optionsBox">
+        <!-- Buttons injected via JS -->
+    </div>
+
+    <!-- FINAL WIN SCREEN -->
+    <div class="overlay" id="winScreen">
+        <div class="win-card">
+            <h2 style="color: #ffd700; font-size: 3rem; margin: 0;">BRAVO! 🏆 </h2>
+            <p style="font-size: 1.5rem;">Svi uzorci su riješeni! Pravi si majstor za Titan!</p>
+            <button onclick="startGame()"
+                style="padding: 15px 30px; font-size: 1.5rem; background: #2ecc71; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold;">IGRAJ
+                PONOVO</button>
+        </div>
+    </div>
+
+    <!-- LEVEL COMPLETE SCREEN (NEW) -->
+    <div class="overlay" id="levelCompleteScreen">
+        <div class="win-card" style="border-color: #2ecc71;">
+            <h2 style="color: #2ecc71; font-size: 3rem; margin: 0;">TOČNO! ✅</h2>
+            <p style="font-size: 1.5rem;">Odlično si riješio uzorak!</p>
+            <button onclick="nextLevel()"
+                style="padding: 15px 30px; font-size: 1.5rem; background: #2ecc71; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold;">SLJEDEĆA
+                RAZINA ➡</button>
+        </div>
+    </div>
+
+    <!-- GAME OVER SCREEN -->
+    <div class="overlay" id="failScreen">
+        <div class="win-card" style="border-color: #ff4444;">
+            <h2 style="color: #ff4444; font-size: 3rem; margin: 0;">UPS! ❌</h2>
+            <p style="font-size: 1.5rem;">To nije bio točan nastavak niza.</p>
+            <button onclick="restartLevel()"
+                style="padding: 15px 30px; font-size: 1.5rem; background: #ff4444; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold;">POKUŠAJ
+                PONOVO</button>
+        </div>
+    </div>
+
+    <!-- START SCREEN OVERLAY -->
+    <div class="overlay" id="startScreen" style="display: flex;">
+        <div class="win-card" style="max-width: 600px;">
+            <h2 style="color: #ffd700; font-size: 3rem; margin: 0; text-transform: uppercase;">Misterij Titana</h2>
+
+            <div
+                style="text-align: left; margin: 20px 0; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
+                <p style="font-size: 1.3rem; margin: 10px 0;">🕵️‍♂️ <strong>MISIJA:</strong> Otkrij koji simbol
+                    nedostaje u nizu!</p>
+                <p style="font-size: 1.3rem; margin: 10px 0;">🧠 <strong>KAKO:</strong>
+                    <br>1. Promotri uzorak (npr. ⭐ 🌑 ⭐ ...).
+                    <br>2. Klikni na simbol koji nastavlja niz.
+                </p>
+                <p style="font-size: 1.3rem; margin: 10px 0;">🏆 <strong>CILJ:</strong> Riješi 10 razina da pobijediš!
+                </p>
+            </div>
+
+            <button onclick="startGame()"
+                style="padding: 15px 40px; font-size: 1.8rem; background: #2ecc71; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 6px 0 #27ae60; transition: transform 0.1s;">KRENI
+                U ISTRAŽIVANJE 🚀</button>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME DATA ---
+        const ITEMS = [
+            { id: 'star', char: '⭐', color: '#ffd700' },     // Gold Star
+            { id: 'moon', char: '🌑', color: '#bdc3c7' },    // Grey Moon
+            { id: 'planet', char: '🪐', color: '#e67e22' },  // Orange Planet
+            { id: 'comet', char: '☄️', color: '#3498db' }    // Blue Comet
+        ];
+
+        let currentLevel = 1;
+        let pattern = [];
+        let solution = null;
+
+        // --- AUDIO ---
+        let audioCtx = null;
+
+        function initAudio() {
+            try {
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) {
+                        audioCtx = new AudioContext();
+                    }
+                }
+                if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume().catch(e => console.log(e));
+            } catch (e) {
+                console.log("Audio init error", e);
+            }
+        }
+
+        function playTone(freq, type = 'sine', duration = 0.2) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.frequency.value = freq;
+                osc.type = type;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { }
+        }
+
+        function playSuccess() {
+            try {
+                playTone(523.25, 'triangle', 0.1);
+                setTimeout(() => playTone(659.25, 'triangle', 0.1), 100);
+                setTimeout(() => playTone(783.99, 'triangle', 0.4), 200);
+            } catch (e) { }
+        }
+
+        function playError() {
+            try { playTone(150, 'sawtooth', 0.3); } catch (e) { }
+        }
+
+        // --- LOGIC ---
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('winScreen').style.display = 'none';
+            document.getElementById('failScreen').style.display = 'none';
+            document.getElementById('levelCompleteScreen').style.display = 'none';
+            initAudio();
+            currentLevel = 1;
+            generatePattern();
+        }
+
+        function restartLevel() {
+            document.getElementById('failScreen').style.display = 'none';
+            // Regenerate
+            generatePattern();
+        }
+
+        function nextLevel() {
+            document.getElementById('levelCompleteScreen').style.display = 'none';
+            if (currentLevel > 10) {
+                document.getElementById('winScreen').style.display = 'flex';
+            } else {
+                generatePattern();
+            }
+        }
+
+        function generatePattern() {
+            pattern = [];
+
+            // Level Logic
+            let sequenceType = 'ABAB';
+
+            if (currentLevel <= 2) {
+                sequenceType = 'ABAB';
+            } else if (currentLevel <= 5) {
+                sequenceType = 'ABC';
+            } else {
+                sequenceType = Math.random() > 0.5 ? 'AABB' : 'ABC';
+            }
+
+            // Pick random items
+            let a = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+            let b = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+            while (b === a) b = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+            let c = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+            while (c === a || c === b) c = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+
+            if (sequenceType === 'ABAB') {
+                pattern = [a, b, a, b, a];
+                solution = b;
+            } else if (sequenceType === 'ABC') {
+                pattern = [a, b, c, a, b];
+                solution = c;
+            } else if (sequenceType === 'AABB') {
+                pattern = [a, a, b, b, a];
+                solution = a;
+            }
+
+            renderGame();
+        }
+
+        function renderGame() {
+            document.getElementById('levelDisplay').innerText = "RAZINA: " + currentLevel + " / 10";
+            const container = document.getElementById('patternBox');
+            container.innerHTML = '';
+
+            const feedback = document.getElementById('feedbackMsg');
+            feedback.innerText = "Promotri niz i nastavi ga...";
+            feedback.style.color = "#ffffff";
+
+            // Render Pattern
+            pattern.forEach((item, index) => {
+                const slot = document.createElement('div');
+                slot.className = 'item-slot filled';
+                slot.innerText = item.char;
+                slot.style.animation = `popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) ${index * 0.1}s backwards`;
+                container.appendChild(slot);
+            });
+
+            // Add QUESTION SLOT
+            const qSlot = document.createElement('div');
+            qSlot.className = 'item-slot question';
+            qSlot.innerText = '?';
+            container.appendChild(qSlot);
+
+            // Render Options
+            const optionsBox = document.getElementById('optionsBox');
+            optionsBox.innerHTML = '';
+
+            // Create options
+            let choices = [solution];
+            while (choices.length < 4) {
+                let random = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+                if (!choices.some(c => c.id === random.id)) choices.push(random);
+            }
+            // Shuffle
+            choices.sort(() => Math.random() - 0.5);
+
+            choices.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = item.char;
+                btn.onclick = function () { checkAnswer(item); };
+                optionsBox.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedItem) {
+            const feedback = document.getElementById('feedbackMsg');
+
+            // Disable buttons
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            if (selectedItem.id === solution.id) {
+                // --- CORRECT ---
+                try {
+                    playSuccess();
+                    feedback.innerText = "TOČNO! Bravo! 🚀";
+                    feedback.style.color = "#2ecc71";
+
+                    const qSlot = document.querySelector('.question');
+                    if (qSlot) {
+                        qSlot.innerText = solution.char;
+                        qSlot.classList.remove('question');
+                        qSlot.classList.add('filled', 'success-anim');
+                    }
+                } catch (e) { }
+
+                // Increase level immediately
+                currentLevel++;
+
+                // SHOW MODAL instead of auto-advance
+                setTimeout(function () {
+                    document.getElementById('levelCompleteScreen').style.display = 'flex';
+                }, 800);
+
+            } else {
+                // --- WRONG ---
+                playError();
+                feedback.innerText = "Netočno!";
+                feedback.style.color = "#ff4444";
+
+                const patternApp = document.getElementById('patternBox');
+                if (patternApp) patternApp.classList.add('shake');
+
+                setTimeout(function () {
+                    document.getElementById('failScreen').style.display = 'flex';
+                }, 800);
+            }
+        }
+    </script>
+</body>
+
+</html>

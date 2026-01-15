@@ -68,10 +68,18 @@
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            padding: 50px 40px;
+            padding: 40px 30px;
             border-radius: 40px;
             border: 2px solid rgba(162, 155, 254, 0.3);
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
+
+            /* Layout Fixes */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         .mission-box h3 {
@@ -90,24 +98,7 @@
             letter-spacing: 0.05em;
         }
 
-        .rocket {
-            font-size: 6rem;
-            display: inline-block;
-            filter: drop-shadow(0 0 20px var(--glow));
-            animation: float-rocket 4s ease-in-out infinite;
-        }
 
-        @keyframes float-rocket {
-
-            0%,
-            100% {
-                transform: translateY(0px) rotate(-8deg);
-            }
-
-            50% {
-                transform: translateY(-30px) rotate(5deg);
-            }
-        }
 
         /* --- RESPONSIVE --- */
         @media (max-width: 768px) {
@@ -138,7 +129,7 @@
 
     <!-- Navigation Buttons -->
     <div style="position: absolute; top: 15px; left: 15px; z-index: 100; display: flex; gap: 10px; flex-wrap: wrap;">
-        <a href="index.html"
+        <a href="../index.html"
             style="text-decoration: none; font-size: 1rem; background: rgba(255, 255, 255, 0.1); padding: 8px 15px; border-radius: 30px; border: 1px solid #7b68ee; color: #7b68ee; transition: 0.2s; box-shadow: 0 0 10px rgba(123, 104, 238, 0.2); font-weight: bold;"
             onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
             onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
@@ -149,6 +140,12 @@
             onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
             onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
             🗺️ IZABERI DESTINACIJU
+        </a>
+        <a href="design.html"
+            style="text-decoration: none; font-size: 1rem; background: rgba(255, 255, 255, 0.1); padding: 8px 15px; border-radius: 30px; border: 1px solid #a29bfe; color: #a29bfe; transition: 0.2s; box-shadow: 0 0 10px rgba(162, 155, 254, 0.2); font-weight: bold;"
+            onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
+            👨‍🚀 ASTRONAUT
         </a>
     </div>
 
@@ -161,9 +158,32 @@
         </header>
 
         <section class="mission-box">
-            <div class="rocket">🚀</div>
-            <h3>Pripremamo lansirnu rampu...</h3>
-            <p>Igre stižu uskoro. Pripremi svoje svemirsko odijelo!</p>
+
+            <a href="galaksija_igre/orbit_game.html"
+                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #00d2ff; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4); transition: transform 0.2s;"
+                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                Igraj: Svemirska Memorijska Orbita 🪐
+            </a>
+            <a href="galaksija_igre/cosmic_game.html"
+                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #ff00ff; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4); transition: transform 0.2s;"
+                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                Igraj: Kozmička Mreža 🕸️
+            </a>
+            <a href="galaksija_igre/detekt_game.html"
+                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #ffd700; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4); transition: transform 0.2s;"
+                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                Igraj: Kozmički Detektiv 🕵️‍♂️
+            </a>
+            <a href="galaksija_igre/titan_game.html"
+                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #ff8c00; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4); transition: transform 0.2s;"
+                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                Igraj: Misterij Titana 🌑
+            </a>
+            <a href="galaksija_igre/zvezdana_game.html"
+                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #deaaff; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(222, 170, 255, 0.4); transition: transform 0.2s;"
+                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                Igraj: Zvjezdana Slagalica 🧩
+            </a>
         </section>
     </div>
 
