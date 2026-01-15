@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Laboratorij Zvijezda</title>
+    <style>
+        /* THEME - Space Laboratory */
+        body {
+            background: #0b1021;
+            background-image:
+                radial-gradient(circle at 50% 50%, rgba(30, 41, 59, 0.8) 0%, rgba(11, 16, 33, 1) 100%),
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
+            color: #dbeafe;
+            font-family: 'Comic Sans MS', 'Verdana', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* BACK BUTTON */
+        .btn-back {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            background: #1e293b;
+            padding: 10px 25px;
+            border-radius: 8px;
+            border: 1px solid #3b82f6;
+            color: #60a5fa;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+            z-index: 100;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-back:hover {
+            background: #334155;
+            color: #93c5fd;
+        }
+
+        /* HEADER */
+        .game-header {
+            text-align: center;
+            padding: 15px;
+            background: rgba(15, 23, 42, 0.9);
+            border-bottom: 2px solid #334155;
+            z-index: 10;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-title {
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
+            color: #fca5a5;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(252, 165, 165, 0.5);
+        }
+
+        /* MONITOR / INSTRUCTION */
+        .lab-monitor {
+            background: #000;
+            border: 4px solid #475569;
+            border-radius: 12px;
+            padding: 15px 30px;
+            margin-top: 15px;
+            display: inline-block;
+            box-shadow: 0 0 20px rgba(71, 85, 105, 0.4);
+            position: relative;
+        }
+
+        .lab-monitor::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.05) 50%, transparent 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        .instruction-box {
+            color: #4ade80;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-shadow: 0 0 5px #4ade80;
+        }
+
+        /* CHAMBERS GRID */
+        .windows-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            justify-content: center;
+            justify-items: center;
+            align-items: center;
+            gap: 30px;
+            padding: 20px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* CHAMBER DESIGN */
+        .chamber-unit {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.8));
+            border: 6px solid #334155;
+            box-shadow:
+                inset 0 0 30px #000,
+                0 0 0 2px #1e293b,
+                0 10px 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+            overflow: hidden;
+        }
+
+        .chamber-unit:hover {
+            transform: scale(1.05);
+            border-color: #60a5fa;
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.4);
+        }
+
+        .chamber-unit:active {
+            transform: scale(0.95);
+        }
+
+        /* Glass reflection */
+        .chamber-unit::after {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: rotate(-45deg);
+        }
+
+        /* Star Groups inside Chamber */
+        .star-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            /* Center the layout block vertically */
+            gap: 4px;
+            width: 75%;
+            /* More inset from chamber edge */
+            height: 75%;
+            pointer-events: none;
+            /* Let clicks pass to chamber */
+        }
+
+        /* Stars - EMOJI ONLY STYLE */
+        .star-orb {
+            font-size: 1.5rem;
+            /* Smaller to prevent overflow */
+            line-height: 1;
+            animation: float 3s ease-in-out infinite;
+            user-select: none;
+            display: inline-flex;
+        }
+
+        .star-orb:nth-child(even) {
+            animation-delay: 1s;
+        }
+
+        .star-orb:nth-child(3n) {
+            animation-delay: 0.5s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        /* Star Color Variants (using filters on Emoji) */
+        .star-orb.color-1 {
+            filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
+        }
+
+        /* Gold */
+        .star-orb.color-2 {
+            filter: hue-rotate(220deg) drop-shadow(0 0 8px rgba(59, 130, 246, 0.9));
+        }
+
+        /* Blue */
+        .star-orb.color-3 {
+            filter: hue-rotate(290deg) drop-shadow(0 0 8px rgba(244, 114, 182, 0.9));
+        }
+
+        /* Pink/Purple */
+        .star-orb.color-4 {
+            filter: hue-rotate(90deg) drop-shadow(0 0 8px rgba(74, 222, 128, 0.9));
+        }
+
+        /* Green */
+        .star-orb.color-5 {
+            filter: hue-rotate(30deg) drop-shadow(0 0 8px rgba(251, 146, 60, 0.9));
+        }
+
+        /* Orange */
+
+        /* Chamber Variations */
+        .chamber-unit.blue-type {
+            border-color: #3b82f6;
+            box-shadow: inset 0 0 20px #000, 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .chamber-unit.red-type {
+            border-color: #f472b6;
+            box-shadow: inset 0 0 20px #000, 0 0 15px rgba(244, 114, 182, 0.3);
+        }
+
+        /* MODALS */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .modal-card {
+            background: #1e293b;
+            color: #f1f5f9;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            max-width: 450px;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .btn-modal {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            font-size: 1.4rem;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 25px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-modal:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-modal:active {
+            transform: translateY(0);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #f1c40f;
+            animation: fall 1s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../planet.html" class="btn-back">⬅ POVRATAK</a>
+
+    <header class="game-header">
+        <h1 class="game-title">LABORATORIJ ZVIJEZDA</h1>
+        <div class="lab-monitor">
+            <div class="instruction-box" id="instructionText">INITIALIZING...</div>
+        </div>
+    </header>
+
+    <!-- CHAMBERS GRID -->
+    <div class="windows-container" id="chambersContainer">
+        <!-- Injected via JS -->
+    </div>
+
+    <!-- MODALS -->
+    <div class="overlay" id="startScreen" style="display:flex;">
+        <div class="modal-card">
+            <h2 style="color:#60a5fa;">DOBRODOŠLI U LAB! 🔬</h2>
+            <p style="font-size:1.2rem; line-height:1.6;">Analiziraj komore.</p>
+            <p style="color:#94a3b8;">KLIKNI na komoru koja se traži.</p>
+            <button class="btn-modal" onclick="startGame()">POKRENI SKENIRANJE ▶</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="successScreen">
+        <div class="modal-card" style="border-color:#22c55e;">
+            <h2 style="color:#22c55e;">UZORAK POTVRĐEN! ✔</h2>
+            <p style="font-size:1.3rem;">Odlična analiza!</p>
+            <button class="btn-modal" onclick="nextLevel()" style="background:#22c55e;">SLJEDEĆI UZORAK ➡</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="failScreen">
+        <div class="modal-card" style="border-color:#ef4444;">
+            <h2 style="color:#ef4444;">GREŠKA U ANALIZI! ❌</h2>
+            <p style="font-size:1.2rem;">Krivi broj čestica.</p>
+            <button class="btn-modal" onclick="closeOverlay('failScreen')" style="background:#ef4444;">PONOVNO SKENIRAJ
+                ↺</button>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME LOGIC ---
+        let currentLevel = 1;
+        let currentMode = 'max'; // 'max' or 'min'
+        let chambers = [];
+
+        const MIN_STARS = 1;
+        const MAX_STARS = 9;
+
+        // Init Audio
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+        function playTone(freq, type = 'sine') {
+            if (!audioCtx) return;
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.frequency.value = freq; o.type = type;
+            o.connect(g); g.connect(audioCtx.destination);
+            o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+            o.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function startGame() {
+            document.getElementById('startScreen').style.display = 'none';
+            initAudio();
+            generateLevel();
+        }
+
+        function closeOverlay(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            document.getElementById('successScreen').style.display = 'none';
+            generateLevel();
+        }
+
+        function generateLevel() {
+            const container = document.getElementById('chambersContainer');
+            container.innerHTML = '';
+            chambers = [];
+
+            // Randomize mode
+            currentMode = Math.random() > 0.5 ? 'max' : 'min';
+            const missionText = currentMode === 'max' ? "PRONAĐI KOMORU S NAJVIŠE ZVJEZDICA!" : "PRONAĐI KOMORU S NAJMANJE ZVJEZDICA!";
+            document.getElementById('instructionText').innerText = missionText;
+
+            // Generate 4 unique counts
+            let counts = new Set();
+            while (counts.size < 4) {
+                counts.add(Math.floor(Math.random() * (MAX_STARS - MIN_STARS + 1)) + MIN_STARS);
+            }
+            const countArray = Array.from(counts);
+
+            // Create Visual Chambers
+            countArray.forEach((count, index) => {
+                const chamberEl = document.createElement('div');
+                // Theme: Blue or Red/Pink to look sci-fi
+                const typeClass = Math.random() > 0.5 ? 'blue-type' : 'red-type';
+                chamberEl.className = `chamber-unit ${typeClass}`;
+                chamberEl.dataset.count = count;
+
+                // Click Event
+                chamberEl.onclick = () => checkAnswer(count);
+
+                const grp = document.createElement('div');
+                grp.className = 'star-group';
+
+                // Random color for THIS whole chamber
+                const chamberColorIdx = Math.floor(Math.random() * 5) + 1;
+
+                // Add stars (Emoji)
+                for (let i = 0; i < count; i++) {
+                    const star = document.createElement('div');
+                    star.className = `star-orb color-${chamberColorIdx}`;
+                    star.innerText = '⭐';
+                    grp.appendChild(star);
+                }
+
+                chamberEl.appendChild(grp);
+                container.appendChild(chamberEl);
+
+                chambers.push({ count: count, el: chamberEl });
+            });
+        }
+
+        function checkAnswer(selectedCount) {
+            // Determine correct answer
+            const allCounts = chambers.map(c => c.count);
+            const correctCount = currentMode === 'max' ? Math.max(...allCounts) : Math.min(...allCounts);
+
+            if (selectedCount === correctCount) {
+                // SUCCESS
+                playTone(800, 'square'); setTimeout(() => playTone(1200, 'square'), 100);
+                spawnConfetti();
+                document.getElementById('successScreen').style.display = 'flex';
+            } else {
+                // FAIL
+                playTone(150, 'sawtooth');
+                document.getElementById('failScreen').style.display = 'flex';
+            }
+        }
+
+        function spawnConfetti() {
+            for (let i = 0; i < 40; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.backgroundColor = ['#3b82f6', '#f472b6', '#4ade80', '#fbbf24'][Math.floor(Math.random() * 4)];
+                c.style.animationDuration = (Math.random() * 1 + 0.5) + 's';
+                document.body.appendChild(c);
+                setTimeout(() => c.remove(), 1500);
+            }
+        }
+    </script>
+</body>
+
+</html>
