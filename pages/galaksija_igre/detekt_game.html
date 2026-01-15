@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kozmički Detektiv</title>
+    <style>
+        /* DETECTIVE THEME - Child Friendly Space Mystery */
+        body {
+            /* Softer, deep space blue instead of harsh black */
+            background: radial-gradient(circle at center, #2e1a47 0%, #1a1a2e 100%);
+            color: #ffffff;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            /* Dyslexia friendly standard */
+            text-align: center;
+            padding: 10px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Scanline effect removed for cleaner look, added soft stars */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat;
+            opacity: 0.3;
+            animation: rotateBackground 100s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes rotateBackground {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* RETURN BUTTON */
+        .btn-back {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            /* Fully rounded */
+            border: 3px solid #00d2ff;
+            color: #00d2ff;
+            transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(0, 210, 255, 0.2);
+            z-index: 100;
+            font-weight: bold;
+        }
+
+        .btn-back:hover {
+            background: #00d2ff;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .game-title {
+            color: #ffd700;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            text-shadow: 3px 3px 0px #d35400;
+            margin: 0;
+            z-index: 10;
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+        }
+
+        .level-display {
+            font-size: 1.8rem;
+            color: #a29bfe;
+            margin-bottom: 10px;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px 20px;
+            border-radius: 20px;
+        }
+
+        .instruction-hint {
+            font-size: 1.3rem;
+            color: #e0d0ff;
+            margin-bottom: 15px;
+        }
+
+        /* GAME GRID */
+        .game-grid {
+            display: grid;
+            gap: 20px;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 5px solid #a29bfe;
+            border-radius: 30px;
+            /* Softer edges */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .grid-item {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            /* Squircle shape */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            user-select: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .grid-item:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1) rotate(5deg);
+            border-color: #ffd700;
+        }
+
+        .grid-item:active {
+            transform: scale(0.9);
+        }
+
+        /* MODALS */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(46, 26, 71, 0.95);
+            /* Deep purple overlay */
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-card {
+            background: #fff;
+            color: #333;
+            border: 8px solid #00d2ff;
+            padding: 30px;
+            border-radius: 40px;
+            text-align: center;
+            max-width: 600px;
+            width: 85%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Comic Sans MS', 'Verdana', sans-serif;
+            letter-spacing: 1px;
+            line-height: 1.5;
+        }
+
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .modal-btn {
+            padding: 15px 40px;
+            font-size: 1.6rem;
+            background: #00d2ff;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.2s;
+            font-family: inherit;
+            /* Keep Comic Sans */
+            box-shadow: 0 5px 0 #0097b8;
+            outline: none;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 0 #0097b8;
+        }
+
+        .modal-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #0097b8;
+        }
+
+        .modal-title {
+            font-size: 2.8rem;
+            margin: 0 0 15px 0;
+            color: #2e1a47;
+            text-transform: uppercase;
+        }
+
+        .instructions {
+            text-align: left;
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+            border: 2px dashed #00d2ff;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        /* Shake Animation */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20% {
+                transform: translateX(-10px);
+            }
+
+            40% {
+                transform: translateX(10px);
+            }
+
+            60% {
+                transform: translateX(-10px);
+            }
+
+            80% {
+                transform: translateX(10px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <a href="../galaxy.html" class="btn-back">⬅ POVRATAK</a>
+
+    <h1 class="game-title">KOZMIČKI DETEKTIV 🕵️‍♂️</h1>
+    <div class="level-display" id="levelDisplay">RAZINA: 1 / 10</div>
+
+    <p class="instruction-hint">Pronađi uljeza! Jedan planet je drugačiji.</p>
+
+    <!-- GAME GRID -->
+    <div class="game-grid" id="gameGrid">
+        <!-- Items injected via JS -->
+    </div>
+
+    <!-- START SCREEN -->
+    <div class="overlay" id="startScreen" style="display: flex;">
+        <div class="modal-card" style="max-width: 600px;">
+            <h2 class="modal-title" style="color: #6c5ce7; font-size: 3rem; margin: 0; text-transform: uppercase;">
+                KOZMIČKI DETEKTIV</h2>
+
+            <div
+                style="text-align: left; margin: 20px 0; background: rgba(0, 210, 255, 0.1); padding: 20px; border-radius: 15px; color: #333;">
+                <p style="font-size: 1.3rem; margin: 10px 0;">🔎 <strong>MISIJA:</strong> Pronađi uljeza!</p>
+                <p style="font-size: 1.3rem; margin: 10px 0;">👀 <strong>KAKO:</strong>
+                    <br>1. Promotri pažljivo sve predmete.
+                    <br>2. Klikni na onaj koji je drugačiji (boja, oblik ili smjer).
+                </p>
+                <p style="font-size: 1.3rem; margin: 10px 0;">🚀 <strong>CILJ:</strong> Riješi 10 slučajeva da
+                    pobijediš!</p>
+            </div>
+
+            <button class="modal-btn" onclick="startGame()"
+                style="background: #6c5ce7; box-shadow: 0 5px 0 #5649b9;">KRENI U ISTRAGU 🔎</button>
+        </div>
+    </div>
+
+    <!-- SUCCESS SCREEN -->
+    <div class="overlay" id="successScreen">
+        <div class="modal-card" style="border: 8px solid #2ecc71;">
+            <h2 class="modal-title" style="color: #2ecc71;">ODLIČNO! ✅</h2>
+            <p style="font-size: 1.5rem;">Našao/la si uljeza!</p>
+            <button class="modal-btn" onclick="nextLevel()"
+                style="background: #2ecc71; box-shadow: 0 5px 0 #27ae60;">SLJEDEĆA RAZINA ➡</button>
+        </div>
+    </div>
+
+    <!-- FAIL SCREEN -->
+    <div class="overlay" id="failScreen">
+        <div class="modal-card" style="border: 8px solid #ff6b6b;">
+            <h2 class="modal-title" style="color: #ff6b6b;">UPS! ❌</h2>
+            <p style="font-size: 1.5rem;">To nije bio uljez. Pokušaj ponovo!</p>
+            <button class="modal-btn" onclick="restartLevel()"
+                style="background: #ff6b6b; box-shadow: 0 5px 0 #e05656;">POKUŠAJ PONOVO ↺</button>
+        </div>
+    </div>
+
+    <!-- WIN SCREEN -->
+    <div class="overlay" id="winScreen">
+        <div class="modal-card" style="border: 8px solid #ffd700;">
+            <h2 class="modal-title" style="color: #ffd700;">BRAVO! 🏆</h2>
+            <p style="font-size: 1.5rem;">Pravi si Kozmički Detektiv! Svi slučajevi su riješeni.</p>
+            <button class="modal-btn" onclick="startGame()"
+                style="background: #ffd700; color: #333; box-shadow: 0 5px 0 #d4b100;">IGRAJ PONOVO 🎉</button>
+        </div>
+    </div>
+
+    <script>
+        // --- GAME DATA ---
+        const EMOJIS = ['🪐', '🚀', '⭐', '🌑', '👽', '☄️', '🛰️', '🌌'];
+
+        let currentLevel = 1;
+        let gridSize = 2; // Starts 2x2
+
+        // --- AUDIO ---
+        let audioCtx = null;
+        function initAudio() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume().catch(e => console.log(e));
+            } catch (e) { }
+        }
+
+        function playTone(freq, type = 'sine', duration = 0.1) {
+            if (!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.frequency.value = freq;
+                osc.type = type;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+                osc.stop(audioCtx.currentTime + duration);
+            } catch (e) { }
+        }
+
+        function playWin() { playTone(600, 'square', 0.1); setTimeout(() => playTone(800, 'square', 0.2), 100); }
+        function playLoss() { playTone(200, 'sawtooth', 0.3); }
+
+        // --- GAME LOGIC ---
+
+        function startGame() {
+            currentLevel = 1;
+            document.querySelectorAll('.overlay').forEach(el => el.style.display = 'none');
+            initAudio();
+            generateLevel();
+        }
+
+        function restartLevel() {
+            document.getElementById('failScreen').style.display = 'none';
+            generateLevel();
+        }
+
+        function nextLevel() {
+            document.getElementById('successScreen').style.display = 'none';
+            if (currentLevel > 10) {
+                document.getElementById('winScreen').style.display = 'flex';
+            } else {
+                generateLevel();
+            }
+        }
+
+        function generateLevel() {
+            document.getElementById('levelDisplay').innerText = `RAZINA: ${currentLevel} / 10`;
+
+            // DIFFICULTY SCALING
+            let size = 2; // 2x2
+            if (currentLevel > 3) size = 3; // 3x3 starts level 4
+            if (currentLevel > 7) size = 4; // 4x4 starts level 8
+
+            // Set Grid CSS
+            const grid = document.getElementById('gameGrid');
+            grid.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+            grid.innerHTML = '';
+
+            // Select Base Item
+            const baseChar = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+
+            // Determine Trait Difference
+            // Lvl 1-3: Different Char
+            // Lvl 4-6: Rotation
+            // Lvl 7+: Hue or Scale
+
+            let diffType = 'char';
+            if (currentLevel > 3 && currentLevel <= 6) diffType = 'rotation';
+            if (currentLevel > 6) diffType = 'hue';
+
+            // Generate Items
+            const totalItems = size * size;
+            const intruderIndex = Math.floor(Math.random() * totalItems);
+
+            for (let i = 0; i < totalItems; i++) {
+                const item = document.createElement('div');
+                item.className = 'grid-item';
+                item.innerText = baseChar;
+
+                if (i === intruderIndex) {
+                    // APPLY DIFFERENCE
+                    if (diffType === 'char') {
+                        // Pick a different char
+                        let newChar = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+                        while (newChar === baseChar) newChar = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+                        item.innerText = newChar;
+                    } else if (diffType === 'hue') {
+                        item.style.filter = 'hue-rotate(90deg)';
+                    } else if (diffType === 'rotation') {
+                        item.style.transform = 'rotate(180deg)';
+                        // Reset hover for this specific implementation might be tricky in pure CSS if inline transform is used
+                        // So we inject a specific class or leave it be, browser handles transform merge usually
+                    }
+
+                    // Click Event - WIN
+                    item.onclick = () => handleWin();
+                } else {
+                    // Click Event - LOSE
+                    item.onclick = (e) => handleLose(e.target);
+                }
+
+                grid.appendChild(item);
+            }
+        }
+
+        function handleWin() {
+            playWin();
+            currentLevel++;
+            document.getElementById('successScreen').style.display = 'flex';
+        }
+
+        function handleLose(element) {
+            playLoss();
+            element.classList.add('shake');
+            setTimeout(() => {
+                element.classList.remove('shake');
+                document.getElementById('failScreen').style.display = 'flex';
+            }, 500);
+        }
+
+    </script>
+</body>
+
+</html>
