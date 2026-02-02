@@ -574,7 +574,10 @@
         let currentLevel = 1; // Always start at Level 1 per user request
 
         let totalScore = 0;
-        let highScore = GameStorage.getHighScore(GAME_ID);
+        let highScore = 0;
+        if (typeof GameStorage !== 'undefined') {
+            highScore = GameStorage.getHighScore(GAME_ID);
+        }
 
         let selected = [];
         let isLocked = false;
