@@ -386,13 +386,57 @@
         };
 
         function init() {
-            if (typeof GameStorage !== 'undefined') {
-                owned = GameStorage.getInventory();
-            } else {
-                console.warn("GameStorage unavailable, loading defaults");
-                // Fallback default
+            // ROBUST FALLBACK: Define data locally if GameStorage is missing
+            if (typeof GameStorage === 'undefined') {
+                console.warn("GameStorage unavailable, using local fallback");
+                window.GameStorage = {
+                    ShopData: {
+                        suits: [
+                            { id: 'suit_white', name: 'Standardna', price: 0, color: '#ffffff', type: 'suit' },
+                            { id: 'suit_blue', name: 'Plava', price: 0, color: '#4CC9F0', type: 'suit' },
+                            { id: 'suit_purple', name: 'Ljubičasta', price: 0, color: '#7000ff', type: 'suit' },
+                            { id: 'suit_gold', name: 'Zlatna', price: 500, color: '#FFD700', type: 'suit' },
+                            { id: 'suit_red', name: 'Crvena', price: 250, color: '#ff4d4d', type: 'suit' },
+                            { id: 'suit_black', name: 'Svemirska', price: 350, color: '#2c3e50', type: 'suit' },
+                            { id: 'suit_green', name: 'Vanzemaljska', price: 200, color: '#2ecc71', type: 'suit' }
+                        ],
+                        visors: [
+                            { id: 'visor_blue', name: 'Standardni', price: 0, color: '#00d2ff', type: 'visor' },
+                            { id: 'visor_dark', name: 'Tamni', price: 0, color: '#1a0033', type: 'visor' },
+                            { id: 'visor_gold', name: 'Zlatni', price: 400, color: '#ffd700', type: 'visor' },
+                            { id: 'visor_pink', name: 'Rozi', price: 150, color: '#ff6b6b', type: 'visor' },
+                            { id: 'visor_green', name: 'Matrix', price: 200, color: '#00ff00', type: 'visor' }
+                        ],
+                        eyes: [
+                            { id: 'eye_black', name: 'Tamne', price: 0, color: '#333333', type: 'eye' },
+                            { id: 'eye_blue', name: 'Plave', price: 0, color: '#4CC9F0', type: 'eye' },
+                            { id: 'eye_purple', name: 'Mistične', price: 0, color: '#7000ff', type: 'eye' },
+                            { id: 'eye_red', name: 'Robot', price: 100, color: '#ff0000', type: 'eye' },
+                            { id: 'eye_white', name: 'Duh', price: 150, color: '#ffffff', type: 'eye' }
+                        ],
+                        hats: [
+                            { id: 'hat_none', name: 'Bez Kape', price: 0, type: 'hat', path: '' },
+                            { id: 'hat_antenna', name: 'Antena', price: 200, type: 'hat', path: '<path d="M100 0 L100 -40 M100 -40 L90 -30 M100 -40 L110 -30" stroke="white" stroke-width="4" stroke-linecap="round" /> <circle cx="100" cy="-45" r="5" fill="red" />' },
+                            { id: 'hat_cowboy', name: 'Kauboj', price: 400, type: 'hat', path: '<path d="M50 10 Q100 40 150 10 L140 -20 Q100 -50 60 -20 Z" fill="#8B4513" stroke="#5D4037" stroke-width="2"/> <rect x="75" y="-30" width="50" height="30" fill="#8B4513" rx="5" />' },
+                            { id: 'hat_crown', name: 'Kruna', price: 800, type: 'hat', path: '<path d="M70 5 L70 -25 L90 -10 L100 -35 L110 -10 L130 -25 L130 5 Z" fill="#FFD700" stroke="#E6BE00" stroke-width="2"/>' }
+                        ]
+                    },
+                    getInventory: function () {
+                        // Return default free items
+                        return [
+                            'suit_white', 'suit_blue', 'suit_purple',
+                            'visor_blue', 'visor_dark',
+                            'eye_black', 'eye_blue', 'eye_purple',
+                            'hat_none'
+                        ];
+                    },
+                    resetProfileProgress: function () {
+                        console.log("Mock reset");
+                    }
+                };
             }
 
+            owned = GameStorage.getInventory();
             loadState();
             renderWardrobe();
         }
