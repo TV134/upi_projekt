@@ -45,24 +45,24 @@
             top: 20px;
             left: 20px;
             text-decoration: none;
-            font-size: 1.1rem;
-            background: rgba(26, 42, 68, 0.8);
-            padding: 10px 25px;
-            border-radius: 50px;
+            font-size: 1rem;
+            background: rgba(0, 242, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 30px;
             border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
             z-index: 100;
             font-weight: bold;
-            transition: all 0.3s;
+            transition: all 0.2s;
             pointer-events: auto;
         }
 
         .btn-back:hover {
-            background: var(--neon-blue);
-            color: var(--space-dark);
-            box-shadow: 0 0 25px var(--neon-blue);
             transform: scale(1.05);
+            background: rgba(0, 242, 255, 0.2);
+            color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
         }
 
         /* Svjetlosna autocesta */
@@ -163,12 +163,27 @@
         /* UI */
         #ui-layer {
             position: absolute;
-            top: 40px;
+            top: 25px;
             width: 100%;
             text-align: center;
             pointer-events: none;
             z-index: 200;
-            /* Povećan z-index da ne idu priko teksta */
+        }
+
+        .level-display {
+            font-size: 1.2rem;
+            color: var(--neon-blue);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+            margin-top: 5px;
+        }
+
+        .score-display {
+            font-size: 1.1rem;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+            margin-top: 5px;
         }
 
         h1 {
@@ -185,14 +200,22 @@
             text-shadow: 0 0 10px var(--neon-blue);
         }
 
-        /* PROVJERI BUTTON */
-        .btn-check {
+        /* CONTROLS CONTAINER */
+        .controls-container {
             position: absolute;
-            bottom: 50px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            padding: 15px 40px;
-            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 150;
+            pointer-events: auto;
+        }
+
+        .btn-check {
+            padding: 15px 45px;
+            font-size: 1.6rem;
             background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
             color: white;
             border: none;
@@ -200,26 +223,39 @@
             cursor: pointer;
             font-family: inherit;
             font-weight: bold;
-            box-shadow: 0 10px 20px rgba(0, 242, 255, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.3);
             transition: all 0.3s;
-            pointer-events: auto;
-            z-index: 100;
         }
 
         .btn-check:hover {
-            transform: translateX(-50%) translateY(-5px);
-            box-shadow: 0 15px 30px rgba(188, 19, 254, 0.5);
-        }
-
-        .btn-check:active {
-            transform: translateX(-50%) translateY(2px);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(188, 19, 254, 0.5);
         }
 
         .btn-check:disabled {
             filter: grayscale(1);
             opacity: 0.5;
             cursor: not-allowed;
-            transform: translateX(-50%);
+        }
+
+        .btn-reset {
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            background: rgba(255, 68, 68, 0.1);
+            border: 2px solid var(--error-red);
+            color: var(--error-red);
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .btn-reset:hover {
+            background: var(--error-red);
+            color: white;
+            box-shadow: 0 0 20px rgba(255, 68, 68, 0.4);
         }
 
         /* MODALS */
@@ -237,15 +273,87 @@
             display: none;
         }
 
-        .modal {
-            background: rgba(26, 42, 68, 0.95);
-            padding: 40px;
-            border-radius: 25px;
-            border: 2px solid var(--neon-blue);
+        .card {
+            background: radial-gradient(circle, #001a00, #000);
+            /* Radar Green/Black */
+            border: 2px solid #00ff88;
+            border-radius: 50%;
+            /* Round radar screen */
+            padding: 60px 30px;
+            width: 450px;
+            height: 450px;
+            max-width: 90%;
             text-align: center;
-            max-width: 400px;
-            animation: modalIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.3);
+            animation: popIn 0.5s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Radar scan line */
+        .card::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 48%;
+            height: 2px;
+            background: rgba(0, 255, 136, 0.8);
+            transform-origin: 0 0;
+            animation: radarSpin 4s linear infinite;
+        }
+
+        @keyframes radarSpin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .card h2 {
+            font-size: 2.5rem;
+            margin: 0 0 15px 0;
+            text-transform: uppercase;
+        }
+
+        .tutorial-step {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #fff;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-start {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #27ae60;
+            transition: transform 0.1s;
+        }
+
+        .btn-start:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #27ae60;
         }
 
         @keyframes modalIn {
@@ -305,9 +413,17 @@
 <body>
 
     <a href="../planet.html" class="btn-back">⬅ POVRATAK</a>
+    <button onclick="showInstructions()"
+        style="position: absolute; top: 20px; right: 20px; background: rgba(0, 242, 255, 0.1); border: 1px solid var(--neon-blue); color: var(--neon-blue); padding: 10px 20px; border-radius: 30px; font-size: 1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; z-index: 100;"
+        onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(0, 242, 255, 0.2)'"
+        onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(0, 242, 255, 0.1)'">
+        ❓ UPUTE
+    </button>
 
     <div id="ui-layer">
         <h1>Satelitska Postaja</h1>
+        <div id="levelText" class="level-display">RAZINA: 1 / 10</div>
+        <div id="scoreText" class="score-display">BODOVI: 0</div>
         <div class="instruction">Pošalji isti broj satelita na tamni planet</div>
     </div>
 
@@ -325,28 +441,60 @@
         </div>
     </div>
 
-    <button id="check-btn" class="btn-check" onclick="checkLogic()">PROVJERI 🚀</button>
+    <div class="controls-container">
+        <button class="btn-reset" onclick="resetTarget()">🗑️ PONIŠTI</button>
+        <button id="check-btn" class="btn-check" onclick="checkLogic()">PROVJERI 🚀</button>
+    </div>
 
     <!-- SUCCESS MODAL -->
     <div id="success-overlay" class="overlay">
-        <div class="modal" style="border-color: var(--success-green);">
+        <div class="card" style="border-color: var(--success-green);">
             <h2 style="color: var(--success-green);">TOP! 🌟</h2>
-            <p>Sateliti su savršeno usklađeni!</p>
-            <button class="btn-modal" style="background: var(--success-green); color: black;"
+            <p style="font-size: 1.2rem;">Sateliti su savršeno usklađeni!</p>
+            <button class="btn-start" style="background: var(--success-green); color: black;"
                 onclick="nextLevel()">DALJE ➡</button>
         </div>
     </div>
 
     <!-- FAIL MODAL -->
     <div id="fail-overlay" class="overlay">
-        <div class="modal" style="border-color: var(--error-red);">
+        <div class="card" style="border-color: var(--error-red);">
             <h2 style="color: var(--error-red);">UPS! 🛰️</h2>
-            <p id="fail-msg">Broj satelita se ne poklapa.</p>
-            <button class="btn-modal" style="background: var(--error-red); color: white;"
-                onclick="resetTarget()">POKUŠAJ PONOVO ↺</button>
+            <p id="fail-msg" style="font-size: 1.2rem;">Broj satelita se ne poklapa. Misija odgođena.</p>
+            <button class="btn-start" style="background: var(--error-red); color: white;"
+                onclick="nextLevelFromError()">DALJE ➡</button>
         </div>
     </div>
 
+    <!-- WIN MODAL -->
+    <div id="win-overlay" class="overlay">
+        <div class="card" style="border-color: #ffd700;">
+            <h2 style="color: #ffd700;">MISIJA ZAVRŠENA! 🏆</h2>
+            <p id="finalSummary" style="font-size: 1.5rem; font-weight: bold; margin: 20px 0;">Osvojeno: 0 / 100 bodova
+            </p>
+            <p style="font-size: 1.1rem; color: #94a3b8;">Bodovi su dodani u tvoj novčanik!</p>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+                <button class="btn-start" style="background: #ffd700; color: black;" onclick="location.reload()">PONOVO
+                    ↺</button>
+                <button class="btn-start" style="background: var(--neon-blue); color: black;"
+                    onclick="window.location.href='../planet.html'">PLANET 🏠</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- TUTORIAL OVERLAY -->
+    <div id="tutorial-overlay" class="overlay">
+        <div class="card">
+            <h2 id="tutorial-title" style="color: var(--neon-blue);">QUOTE UPUTE</h2>
+            <div id="tutorial-content" style="text-align: left; margin-bottom: 20px;">
+                <!-- Content injected by JS -->
+            </div>
+            <button class="btn-start" id="tutorial-main-btn" onclick="closeInstructions()">RAZUMIJEM! 🚀</button>
+        </div>
+    </div>
+
+    <script src="../../game_storage.js"></script>
     <script>
         const sourceSystem = document.getElementById('source-system');
         const targetSystem = document.getElementById('target-system');
@@ -356,16 +504,82 @@
         const successOverlay = document.getElementById('success-overlay');
         const failOverlay = document.getElementById('fail-overlay');
 
+        const GAME_ID = 'satellite_count';
         let requiredSatellites = 0;
         let currentSatellites = 0;
+        let totalScore = 0;
+        let currentLevel = 1;
+        if (currentLevel > 10) currentLevel = 1;
         let isTransitioning = false;
+        let isPaused = true;
+
+        // --- Tutorial Logic ---
+        function showInstructions() {
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerText = "🎓 UPUTE";
+            content.innerHTML =
+                `<div class="tutorial-step">🛰️ <span><strong style="color:var(--neon-blue)">Misija:</strong> Izjednači broj satelita!</span></div>` +
+                `<div class="tutorial-step">👇 <span><strong style="color:var(--neon-blue)">Kako:</strong> Klikni na <span style="border: 1px dashed var(--neon-blue); padding: 2px 5px; border-radius: 5px;">tamni planet</span> da dodaš satelit.</span></div>` +
+                `<div class="tutorial-step">🔢 <span><strong style="color:var(--neon-blue)">Cilj:</strong> Broj satelita lijevo i desno mora biti <strong>ISTI</strong>.</span></div>`;
+
+            btn.innerText = "NASTAVI 🚀";
+            btn.onclick = closeInstructions;
+
+            overlay.style.display = 'flex';
+            isPaused = true;
+        }
+
+        function closeInstructions() {
+            document.getElementById('tutorial-overlay').style.display = 'none';
+            isPaused = false;
+        }
+
+        function showStartScreen() {
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerText = "SATELITSKA VEZA";
+            title.style.color = "#00ff88";
+            title.style.textShadow = "0 0 10px #00ff88";
+
+            content.innerHTML =
+                `<div class="tutorial-step" style="background:transparent; justify-content:center;">
+                    🛰️ <span style="color:#00ff88">ZADATAK:</span> Kopiraj broj satelita.
+                 </div>` +
+                `<div class="tutorial-step" style="background:transparent; justify-content:center;">
+                    👆 <span style="color:#00ff88">AKCIJA:</span> Klikni na desni planet.
+                 </div>`;
+
+            btn.innerText = "USPOSTAVI VEZU 📶";
+            btn.style.background = "#00ff88";
+            btn.style.color = "#000";
+            btn.style.zIndex = "10";
+            btn.style.border = "2px solid #fff";
+            btn.onclick = () => {
+                closeInstructions();
+                initLevel();
+            };
+
+            overlay.style.display = 'flex';
+        }
 
         function refreshSatellitePositions(system, count) {
             const containers = system.querySelectorAll('.orbit-container');
             const orbits = system.querySelectorAll('.orbit');
 
             containers.forEach((container, i) => {
-                const radius = 90 + (i * 30); // Malo uži radijusi da ne udaraju u tekst
+                // Adjust radius based on count to prevent text overlap
+                // If count is high (up to 10), we use smaller increments
+                const baseRadius = 80;
+                const increment = count > 6 ? 22 : 30;
+                const radius = baseRadius + (i * increment);
+
                 container.style.width = `${radius * 2}px`;
                 container.style.height = `${radius * 2}px`;
 
@@ -386,8 +600,11 @@
             const container = document.createElement('div');
             container.className = 'orbit-container';
 
-            // Brzina ovisi o udaljenosti (dalji idu sporije)
-            const duration = 15 + (index * 5);
+            // Brzina ovisi o udaljenosti i nivou
+            let baseDuration = 16 - (currentLevel * 0.6); // 15.4s to 10s
+            if (baseDuration < 8) baseDuration = 8;
+
+            const duration = baseDuration + (index * 2);
             container.style.animationDuration = `${duration}s`;
             // Početni kut da nisu svi u istoj liniji
             container.style.transform = `rotate(${Math.random() * 360}deg)`;
@@ -404,7 +621,16 @@
 
         function initLevel() {
             isTransitioning = false;
-            requiredSatellites = Math.floor(Math.random() * 6) + 1; // 1 do 6
+            document.getElementById('levelText').innerText = `RAZINA: ${currentLevel} / 10`;
+            document.getElementById('scoreText').innerText = `BODOVI: ${totalScore}`;
+
+            // Scaling required satellites
+            let minSat = 1 + Math.floor(currentLevel * 0.8);
+            let maxSat = minSat + 1;
+            if (maxSat > 10) maxSat = 10;
+            if (minSat > 9) minSat = 9;
+
+            requiredSatellites = Math.floor(Math.random() * (maxSat - minSat + 1)) + minSat;
             currentSatellites = 0;
             checkBtn.disabled = true;
 
@@ -425,9 +651,9 @@
         }
 
         targetCore.addEventListener('click', () => {
-            if (isTransitioning) return;
+            if (isTransitioning || isPaused) return;
 
-            if (currentSatellites < 6) { // Max 6 satelita
+            if (currentSatellites < 10) { // Limit to 10
                 currentSatellites++;
                 createSatellite(targetSystem, currentSatellites - 1, currentSatellites);
                 checkBtn.disabled = false;
@@ -435,10 +661,16 @@
         });
 
         function checkLogic() {
-            if (isTransitioning) return;
+            if (isTransitioning || isPaused) return;
 
             if (currentSatellites === requiredSatellites) {
                 isTransitioning = true;
+                totalScore += 10;
+                if (typeof GameStorage !== 'undefined') {
+                    GameStorage.addCredits(10);
+                }
+                document.getElementById('scoreText').innerText = `BODOVI: ${totalScore}`;
+
                 highway.style.opacity = '1';
                 highway.style.width = '45%';
                 targetCore.classList.add('win-glow');
@@ -455,19 +687,43 @@
         }
 
         function resetTarget() {
+            if (isPaused) return;
             targetSystem.querySelectorAll('.orbit-container, .orbit').forEach(el => el.remove());
             currentSatellites = 0;
             checkBtn.disabled = true;
             failOverlay.style.display = 'none';
         }
 
-        function nextLevel() {
-            initLevel();
+        function nextLevelFromError() {
+            failOverlay.style.display = 'none';
+            if (currentLevel < 10) {
+                currentLevel++;
+                initLevel();
+            } else {
+                finishGame();
+            }
         }
 
-        initLevel();
-    </script>
+        function nextLevel() {
+            if (currentLevel < 10) {
+                currentLevel++;
+                initLevel();
+            } else {
+                finishGame();
+            }
+        }
 
+        function finishGame() {
+            document.getElementById('finalSummary').innerText = `Osvojeno: ${totalScore} / 100 bodova`;
+            if (typeof GameStorage !== 'undefined') {
+                GameStorage.saveProgress(GAME_ID, 11);
+            }
+            document.getElementById('win-overlay').style.display = 'flex';
+        }
+
+        // Initialize with Start Screen
+        showStartScreen();
+    </script>
 </body>
 
 </html>
