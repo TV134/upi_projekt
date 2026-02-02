@@ -9,7 +9,7 @@
         body {
             background: linear-gradient(135deg, #2C1810 0%, #000000 100%);
             color: #ffffff;
-            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
             text-align: center;
             padding: 10px;
             margin: 0;
@@ -60,7 +60,7 @@
             font-size: 1.2rem;
             background: rgba(255, 165, 0, 0.1);
             padding: 10px 20px;
-            border-radius: 30px;
+            border-radius: 50px;
             border: 2px solid #ffd700;
             color: #ffd700;
             transition: 0.2s;
@@ -215,13 +215,35 @@
             z-index: 1000;
         }
 
-        .win-card {
-            background: #1a1a1a;
-            border: 4px solid #ffd700;
+        .card {
+            background: repeating-linear-gradient(45deg,
+                    #1e1e1e,
+                    #1e1e1e 10px,
+                    #252525 10px,
+                    #252525 20px);
+            color: #ffd700;
+            border: 8px solid #ff8c00;
             padding: 40px;
-            border-radius: 30px;
+            border-radius: 10px;
+            /* Industrial corners */
             text-align: center;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 50px rgba(255, 140, 0, 0.4), inset 0 0 50px rgba(0, 0, 0, 0.8);
             animation: popIn 0.5s;
+            position: relative;
+        }
+
+        .card::before {
+            content: "⚠ ZONE: TITAN ⚠";
+            display: block;
+            background: #ff8c00;
+            color: #000;
+            font-weight: 900;
+            padding: 5px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            letter-spacing: 2px;
         }
 
         @keyframes popIn {
@@ -275,15 +297,57 @@
         .success-anim {
             animation: successPop 0.5s ease-out;
         }
+
+        .btn-start {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #27ae60;
+            transition: transform 0.1s;
+        }
+
+        .btn-start:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #27ae60;
+        }
+
+        .tutorial-step {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #fff;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
     </style>
 </head>
 
 <body>
 
     <a href="../galaxy.html" class="btn-back">⬅ POVRATAK</a>
+    <button onclick="showInstructions()"
+        style="position: absolute; top: 15px; right: 15px; background: rgba(255, 165, 0, 0.1); border: 2px solid #ffd700; color: #ffd700; padding: 10px 20px; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; z-index: 100;"
+        onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 165, 0, 0.2)'"
+        onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 165, 0, 0.1)'">
+        ❓ UPUTE
+    </button>
 
     <h1 class="game-title">MISTERIJ TITANA</h1>
     <div class="level-display" id="levelDisplay">RAZINA: 1 / 10</div>
+    <div id="scoreText" style="font-size: 1.2rem; color: #ffd700; font-weight: bold; margin-bottom: 10px;">BODOVI: 0
+    </div>
 
     <div class="feedback" id="feedbackMsg">Promotri niz i nastavi ga...</div>
 
@@ -299,57 +363,42 @@
 
     <!-- FINAL WIN SCREEN -->
     <div class="overlay" id="winScreen">
-        <div class="win-card">
+        <div class="card">
             <h2 style="color: #ffd700; font-size: 3rem; margin: 0;">BRAVO! 🏆 </h2>
             <p style="font-size: 1.5rem;">Svi uzorci su riješeni! Pravi si majstor za Titan!</p>
-            <button onclick="startGame()"
-                style="padding: 15px 30px; font-size: 1.5rem; background: #2ecc71; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold;">IGRAJ
-                PONOVO</button>
+            <button onclick="startGame()" class="btn-start"
+                style="background: #ffd700; color: #333; box-shadow: 0 6px 0 #b45309;">IGRAJ PONOVO</button>
         </div>
     </div>
 
     <!-- LEVEL COMPLETE SCREEN (NEW) -->
     <div class="overlay" id="levelCompleteScreen">
-        <div class="win-card" style="border-color: #2ecc71;">
+        <div class="card" style="border-color: #2ecc71;">
             <h2 style="color: #2ecc71; font-size: 3rem; margin: 0;">TOČNO! ✅</h2>
             <p style="font-size: 1.5rem;">Odlično si riješio uzorak!</p>
-            <button onclick="nextLevel()"
-                style="padding: 15px 30px; font-size: 1.5rem; background: #2ecc71; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold;">SLJEDEĆA
-                RAZINA ➡</button>
+            <button onclick="nextLevel()" class="btn-start">SLJEDEĆA RAZINA ➡</button>
         </div>
     </div>
 
     <!-- GAME OVER SCREEN -->
     <div class="overlay" id="failScreen">
-        <div class="win-card" style="border-color: #ff4444;">
+        <div class="card" style="border-color: #ff4444;">
             <h2 style="color: #ff4444; font-size: 3rem; margin: 0;">UPS! ❌</h2>
             <p style="font-size: 1.5rem;">To nije bio točan nastavak niza.</p>
-            <button onclick="restartLevel()"
-                style="padding: 15px 30px; font-size: 1.5rem; background: #ff4444; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold;">POKUŠAJ
-                PONOVO</button>
+            <button onclick="restartLevel()" class="btn-start"
+                style="background: #ff4444; box-shadow: 0 6px 0 #991b1b;">POKUŠAJ PONOVO</button>
         </div>
     </div>
 
-    <!-- START SCREEN OVERLAY -->
-    <div class="overlay" id="startScreen" style="display: flex;">
-        <div class="win-card" style="max-width: 600px;">
-            <h2 style="color: #ffd700; font-size: 3rem; margin: 0; text-transform: uppercase;">Misterij Titana</h2>
-
-            <div
-                style="text-align: left; margin: 20px 0; background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
-                <p style="font-size: 1.3rem; margin: 10px 0;">🕵️‍♂️ <strong>MISIJA:</strong> Otkrij koji simbol
-                    nedostaje u nizu!</p>
-                <p style="font-size: 1.3rem; margin: 10px 0;">🧠 <strong>KAKO:</strong>
-                    <br>1. Promotri uzorak (npr. ⭐ 🌑 ⭐ ...).
-                    <br>2. Klikni na simbol koji nastavlja niz.
-                </p>
-                <p style="font-size: 1.3rem; margin: 10px 0;">🏆 <strong>CILJ:</strong> Riješi 10 razina da pobijediš!
-                </p>
+    <!-- TUTORIAL OVERLAY -->
+    <div class="overlay" id="tutorial-overlay" style="display: flex;">
+        <div class="card">
+            <h2 id="tutorial-title"
+                style="color: #ffd700; font-size: 2.5rem; margin: 0 0 15px 0; text-transform: uppercase;">UPUTE</h2>
+            <div id="tutorial-content" style="text-align: left; margin: 15px 0;">
+                <!-- Content injected by JS -->
             </div>
-
-            <button onclick="startGame()"
-                style="padding: 15px 40px; font-size: 1.8rem; background: #2ecc71; border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 6px 0 #27ae60; transition: transform 0.1s;">KRENI
-                U ISTRAŽIVANJE 🚀</button>
+            <button id="tutorial-main-btn" onclick="closeInstructions()" class="btn-start">RAZUMIJEM! 🚀</button>
         </div>
     </div>
 
@@ -361,6 +410,19 @@
             { id: 'planet', char: '🪐', color: '#e67e22' },  // Orange Planet
             { id: 'comet', char: '☄️', color: '#3498db' }    // Blue Comet
         ];
+
+        const GAME_ID = 'titan_game';
+        let totalScore = 0;
+        let highScore = 0;
+
+        // Initialize high score safely
+        try {
+            if (typeof GameStorage !== 'undefined') {
+                highScore = GameStorage.getHighScore(GAME_ID);
+            }
+        } catch (e) {
+            console.log("GameStorage not found");
+        }
 
         let currentLevel = 1;
         let pattern = [];
@@ -410,10 +472,64 @@
             try { playTone(150, 'sawtooth', 0.3); } catch (e) { }
         }
 
+        // --- Tutorial Logic ---
+        function showInstructions() {
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerText = "🎓 UPUTE";
+            content.innerHTML =
+                `<div class="tutorial-step">🕵️‍♂️ <span><strong style="color:#ffd700">MISIJA:</strong> Otkrij koji simbol nedostaje!</span></div>` +
+                `<div class="tutorial-step">🧠 <span><strong style="color:#ffd700">KAKO:</strong> Klikni na simbol koji nastavlja niz.</span></div>`;
+
+            btn.innerText = "NASTAVI 🚀";
+            btn.onclick = closeInstructions;
+
+            overlay.style.display = 'flex';
+        }
+
+        function closeInstructions() {
+            document.getElementById('tutorial-overlay').style.display = 'none';
+        }
+
+        function showStartScreen() {
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerText = "ULAZAK U ATMOSFERU";
+            title.style.color = "#ff8c00";
+            title.style.fontSize = "2rem";
+            title.style.borderBottom = "2px dashed #ff8c00";
+            title.style.paddingBottom = "10px";
+
+            content.innerHTML =
+                `<div class="tutorial-step" style="background: rgba(0,0,0,0.4); border: 1px solid #ff8c00;">
+                    🕵️‍♂️ <span><strong style="color:#ffd700">PROTOKOL:</strong> Analiziraj uzorak.</span>
+                 </div>` +
+                `<div class="tutorial-step" style="background: rgba(0,0,0,0.4); border: 1px solid #ff8c00;">
+                    👆 <span><strong style="color:#ffd700">AKCIJA:</strong> Odaberi simbol koji nedostaje.</span>
+                 </div>`;
+
+            btn.innerText = "INICIRAJ SLETANJE 🚧";
+            btn.style.background = "#ff8c00";
+            btn.style.color = "#000";
+            btn.style.borderRadius = "5px";
+            btn.style.border = "2px solid #fff";
+            btn.onclick = () => {
+                closeInstructions();
+                startGame();
+            };
+
+            overlay.style.display = 'flex';
+        }
+
         // --- LOGIC ---
 
         function startGame() {
-            document.getElementById('startScreen').style.display = 'none';
             document.getElementById('winScreen').style.display = 'none';
             document.getElementById('failScreen').style.display = 'none';
             document.getElementById('levelCompleteScreen').style.display = 'none';
@@ -540,6 +656,16 @@
                     }
                 } catch (e) { }
 
+                totalScore += 10;
+                document.getElementById('scoreText').innerText = `BODOVI: ${totalScore}`;
+                if (typeof GameStorage !== 'undefined') {
+                    GameStorage.addCredits(10);
+                    if (totalScore > highScore) {
+                        highScore = totalScore;
+                        GameStorage.saveHighScore(GAME_ID, highScore);
+                    }
+                }
+
                 // Increase level immediately
                 currentLevel++;
 
@@ -562,6 +688,10 @@
                 }, 800);
             }
         }
+    </script>
+    </script>
+    <script>
+        showStartScreen();
     </script>
 </body>
 

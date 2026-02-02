@@ -9,7 +9,7 @@
         body {
             background: linear-gradient(135deg, #100b29 0%, #240b36 100%);
             color: #ffffff;
-            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
             text-align: center;
             padding: 10px;
             margin: 0;
@@ -19,7 +19,8 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -198,18 +199,43 @@
         }
 
         .modal-card {
-            background: #fff;
-            color: #333;
-            border: 8px solid #00d2ff;
-            padding: 30px;
-            border-radius: 40px;
+            background: rgba(16, 11, 41, 0.95);
+            /* Cyber Theme Base */
+            color: #00d2ff;
+            border: 2px solid #00d2ff;
+            padding: 40px;
+            border-radius: 20px;
             text-align: center;
             max-width: 500px;
             width: 90%;
             animation: popIn 0.4s;
-            font-family: 'Comic Sans MS', 'Verdana', sans-serif;
-            letter-spacing: 1px;
             line-height: 1.5;
+            box-shadow: 0 0 50px rgba(0, 210, 255, 0.2), inset 0 0 30px rgba(0, 210, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Cyber Scanline */
+        .modal-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, transparent, rgba(0, 210, 255, 0.8), transparent);
+            opacity: 0.5;
+            animation: scanline 3s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% {
+                top: -10%;
+            }
+
+            100% {
+                top: 110%;
+            }
         }
 
         @keyframes popIn {
@@ -225,9 +251,43 @@
         }
 
         .modal-title {
-            margin: 0 0 10px 0;
+            margin: 0 0 15px 0;
             font-size: 2.5rem;
             text-transform: uppercase;
+        }
+
+        .tutorial-step {
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #fff;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .btn-start {
+            margin-top: 20px;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #27ae60;
+            transition: transform 0.1s;
+        }
+
+        .btn-start:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #27ae60;
         }
 
         .modal-btn {
@@ -267,6 +327,14 @@
 
     <h1 class="game-title">KOZMIČKA MREŽA</h1>
     <div class="level-display" id="levelDisplay">RAZINA: 1 / 10</div>
+    <div id="scoreText" style="font-size: 1.2rem; color: #ffd700; font-weight: bold; margin-bottom: 10px;">BODOVI: 0
+    </div>
+    <button onclick="showInstructions()"
+        style="position: absolute; top: 15px; right: 15px; background: rgba(0, 210, 255, 0.1); border: 2px solid #00d2ff; color: #00d2ff; padding: 10px 20px; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.2s; z-index: 100;"
+        onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(0, 210, 255, 0.2)'"
+        onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(0, 210, 255, 0.1)'">
+        ❓ UPUTE
+    </button>
 
     <div class="legend">
         <!-- Visual reminder of symbols -->
@@ -283,24 +351,14 @@
 
     <button class="btn-check" onclick="checkSolution()">PROVJERI ✅</button>
 
-    <!-- START MODAL -->
-    <div class="overlay" id="startScreen" style="display: flex;">
-        <div class="modal-card" style="max-width: 600px;">
-            <h2 style="color: #6c5ce7; font-size: 3rem; margin: 0; text-transform: uppercase;">KOZMIČKA MREŽA</h2>
-
-            <div
-                style="text-align: left; margin: 20px 0; background: rgba(108, 92, 231, 0.1); padding: 20px; border-radius: 15px; color: #333;">
-                <p style="font-size: 1.3rem; margin: 10px 0;">🕸️ <strong>MISIJA:</strong> Popuni mrežu bojama!</p>
-                <p style="font-size: 1.3rem; margin: 10px 0;">🎨 <strong>KAKO:</strong>
-                    <br>1. Klikni na polje da promijeniš znak (🔴 🔵 🟡).
-                    <br>2. Svaki red i stupac mora imati sve 3 boje.
-                    <br>3. Pazi da se ne ponavljaju!
-                </p>
-                <p style="font-size: 1.3rem; margin: 10px 0;">✨ <strong>CILJ:</strong> Riješi 10 razina da pobijediš!
-                </p>
+    <!-- TUTORIAL OVERLAY -->
+    <div class="overlay" id="tutorial-overlay" style="display: flex;">
+        <div class="modal-card">
+            <h2 id="tutorial-title" class="modal-title" style="color: #6c5ce7;">UPUTE</h2>
+            <div id="tutorial-content" style="text-align: left; margin: 20px 0;">
+                <!-- Content injected by JS -->
             </div>
-
-            <button class="modal-btn" onclick="startGame()">IGRAJ ▶</button>
+            <button class="btn-start" id="tutorial-main-btn" onclick="closeInstructions()">RAZUMIJEM! 🚀</button>
         </div>
     </div>
 
@@ -309,7 +367,7 @@
         <div class="modal-card" style="border-color: #2ecc71;">
             <h2 class="modal-title" style="color: #2ecc71;">TOČNO!</h2>
             <p style="font-size: 1.5rem;">Mreža je ispravno popunjena!</p>
-            <button class="modal-btn" onclick="nextLevel()" style="background: #2ecc71;">DALJE ➡</button>
+            <button class="btn-start" onclick="nextLevel()" style="background: #2ecc71;">DALJE ➡</button>
         </div>
     </div>
 
@@ -318,10 +376,12 @@
         <div class="modal-card" style="border-color: #ffd700;">
             <h2 class="modal-title" style="color: #ffd700;">BRAVO! 🏆</h2>
             <p style="font-size: 1.5rem;">Kozmička mreža je stabilna!</p>
-            <button class="modal-btn" onclick="startGame()" style="background: #ffd700; color: #333;">PONOVNO ↺</button>
+            <button class="btn-start" onclick="startGame()"
+                style="background: #ffd700; color: #333; box-shadow: 0 6px 0 #b45309;">PONOVNO ↺</button>
         </div>
     </div>
 
+    <script src="../../game_storage.js"></script>
     <script>
         // SYMBOLS
         const SYMBOLS = ['🔴', '🔵', '🟡']; // 0, 1, 2
@@ -330,6 +390,17 @@
         let playerGrid = [];
         let currentLevel = 1;
         let lockedCells = [];
+
+        const GAME_ID = 'cosmic_game';
+        let totalScore = 0;
+        let highScore = 0;
+
+        // Initialize high score safely
+        try {
+            highScore = GameStorage.getHighScore(GAME_ID);
+        } catch (e) {
+            console.log("GameStorage not found");
+        }
 
         let audioCtx = null;
         function initAudio() {
@@ -343,7 +414,8 @@
             if (!audioCtx) return;
             const o = audioCtx.createOscillator();
             const g = audioCtx.createGain();
-            o.freq = freq; o.type = type;
+            o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            o.type = type;
             o.connect(g); g.connect(audioCtx.destination);
             o.start(); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
             o.stop(audioCtx.currentTime + 0.1);
@@ -377,75 +449,11 @@
             return finalGrid;
         }
 
-        function generateLevel() {
-            document.getElementById('levelDisplay').innerText = `RAZINA: ${currentLevel} / 10`;
-            solutionGrid = generateLatinSquare();
-            playerGrid = [
-                [null, null, null],
-                [null, null, null],
-                [null, null, null]
-            ];
-
-            // Difficulty (Items removed)
-            // Lvl 1: Remove 3 items
-            // Lvl 5: Remove 5 items
-            // Lvl 10: Remove 6 items (Leave 3)
-            let itemsToRemove = 3 + Math.floor(currentLevel / 3);
-            if (itemsToRemove > 6) itemsToRemove = 6;
-
-            // Create list of all coords
-            let coords = [];
-            for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) coords.push({ r, c });
-            coords.sort(() => Math.random() - 0.5);
-
-            // Keep some, remove others
-            lockedCells = []; // Reset
-
-            // First loop: Fill player grid with solution initially
-            for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) playerGrid[r][c] = solutionGrid[r][c];
-
-            // Now remove specific ones
-            for (let i = 0; i < itemsToRemove; i++) {
-                let p = coords[i];
-                playerGrid[p.r][p.c] = null; // Empty this one
-            }
-
-            renderGrid();
-        }
-
-        function renderGrid() {
-            const container = document.getElementById('grid');
-            container.innerHTML = '';
-
-            for (let r = 0; r < 3; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const val = playerGrid[r][c];
-                    const div = document.createElement('div');
-                    div.className = 'cell';
-
-                    // Is this a locked cell? 
-                    // Logic: If it came from solution and wasn't removed, it's locked?
-                    // No, we need to track which ones show be locked.
-                    // Better approach: Check if it was null in "initial state". 
-                    // Actually, simple check: generated removed ones are null.
-                    // BUT re-rendering needs to know if user filled it or game filled it.
-                    // Let's deduce locked status: 
-                    // If we just generated level, we know which are null.
-                    // We need to persist "locked" status.
-                    // Let's store locked coords in `lockedCells` during generation.
-                }
-            }
-
-            // RE-DO GENERATION LOGIC TO SUPPORT LOCKING
-            // Simplified: We clear and rebuild DOM.
-        }
-
-        // --- CORRECT RENDER/STATE LOGIC ---
         function startGame() {
             currentLevel = 1;
-            document.getElementById('startScreen').style.display = 'none';
             document.getElementById('finalScreen').style.display = 'none';
             initAudio();
+            isPaused = false; // Ensure game is unpaused
             startLevelLogic();
         }
 
@@ -492,25 +500,97 @@
 
             for (let r = 0; r < 3; r++) {
                 for (let c = 0; c < 3; c++) {
-                    const div = document.createElement('div');
-                    div.className = 'cell';
                     const val = playerGrid[r][c];
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${r}-${c}`;
 
-                    if (val !== null) div.innerText = SYMBOLS[val];
-
+                    // Check if locked
                     if (lockedCells.includes(`${r}-${c}`)) {
-                        div.classList.add('locked');
+                        cell.classList.add('locked');
+                        cell.innerText = SYMBOLS[val];
+                    } else if (val !== null) {
+                        cell.innerText = SYMBOLS[val];
+                        cell.onclick = () => cycleCell(r, c);
                     } else {
-                        // Interactive
-                        div.onclick = () => cycleCell(r, c);
+                        cell.onclick = () => cycleCell(r, c);
                     }
-                    div.id = `cell-${r}-${c}`;
-                    container.appendChild(div);
+
+                    container.appendChild(cell);
                 }
             }
         }
 
+
+
+
+        function showInstructions() {
+            isPaused = true;
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerText = "🎓 UPUTE";
+            content.innerHTML =
+                `<div class="tutorial-step">🔴 <span><strong style="color:#00d2ff">Zadatak:</strong> Popuni mrežu bojama.</span></div>` +
+                `<div class="tutorial-step">🧩 <span><strong style="color:#00d2ff">Pravilo:</strong> Svaki red i stupac moraju imati sve 3 boje.</span></div>` +
+                `<div class="tutorial-step">👆 <span><strong style="color:#00d2ff">Kontrole:</strong> Klikni na polje da promijeniš boju.</span></div>`;
+
+            btn.innerText = "NASTAVI 🚀";
+            btn.onclick = closeInstructions;
+            overlay.style.display = 'flex';
+        }
+
+        function showStartScreen() {
+            isPaused = true;
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerHTML = "<span style='font-size:3rem; display:block; margin-bottom:10px;'>🌐</span>SISTEM ONLINE";
+            title.style.color = "#00d2ff";
+            title.style.textShadow = "0 0 10px #00d2ff";
+
+            content.innerHTML =
+                `<div class="tutorial-step" style="border: 1px solid rgba(0,210,255,0.3); background: rgba(0,20,40,0.6);">
+                    🧩 <span><strong style="color:#00d2ff">MISIJA:</strong> Inicijaliziraj kozmičku mrežu.</span>
+                 </div>` +
+                `<div class="tutorial-step" style="border: 1px solid rgba(0,210,255,0.3); background: rgba(0,20,40,0.6);">
+                    👆 <span><strong style="color:#ff00ff">PROTOKOL:</strong> Klikni na polja za popravak.</span>
+                 </div>`;
+
+            btn.innerText = "POKRENI SISTEM ⚡";
+            btn.style.background = "transparent";
+            btn.style.border = "2px solid #2ecc71";
+            btn.style.color = "#2ecc71";
+            btn.style.boxShadow = "0 0 15px rgba(46, 204, 113, 0.4)";
+            btn.onmouseover = function () {
+                this.style.background = "#2ecc71";
+                this.style.color = "#000";
+                this.style.boxShadow = "0 0 30px rgba(46, 204, 113, 0.8)";
+            };
+            btn.onmouseout = function () {
+                this.style.background = "transparent";
+                this.style.color = "#2ecc71";
+                this.style.boxShadow = "0 0 15px rgba(46, 204, 113, 0.4)";
+            };
+
+            btn.onclick = () => {
+                closeInstructions();
+                startGame();
+            };
+            overlay.style.display = 'flex';
+        }
+
+        function closeInstructions() {
+            document.getElementById('tutorial-overlay').style.display = 'none';
+            isPaused = false;
+        }
         function cycleCell(r, c) {
+            if (isPaused) return; // Prevent interaction if paused
+
             let val = playerGrid[r][c];
             if (val === null) val = 0;
             else val = (val + 1) % 3; // 0->1->2->0
@@ -526,16 +606,9 @@
         }
 
         function checkSolution() {
-            let correct = true;
+            if (isPaused) return; // Prevent checking if paused
 
-            // Check against solutionGrid? 
-            // Note: Latin Squares can have multiple solutions if clues are few.
-            // But we want to enforce OUR solution or ANY valid solution?
-            // "Sudoku" usually has 1 unique solution.
-            // For simplicity/robustness, let's check basic Latin Square rules:
-            // 1. No cell empty
-            // 2. Each row unique
-            // 3. Each col unique
+            let correct = true;
 
             // 1. Empty Check
             for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) {
@@ -569,6 +642,16 @@
             }
 
             if (correct) {
+                totalScore += 10;
+                document.getElementById('scoreText').innerText = `BODOVI: ${totalScore}`;
+                if (typeof GameStorage !== 'undefined') {
+                    GameStorage.addCredits(10);
+                    if (totalScore > highScore) {
+                        highScore = totalScore;
+                        GameStorage.saveHighScore(GAME_ID, highScore);
+                    }
+                }
+
                 playTone(600, 'square'); setTimeout(() => playTone(800, 'square'), 100);
                 document.getElementById('successScreen').style.display = 'flex';
             } else {
@@ -582,6 +665,9 @@
             setTimeout(() => el.classList.remove('error'), 500);
         }
 
+    </script>
+    <script>
+        showStartScreen();
     </script>
 </body>
 

@@ -9,7 +9,7 @@
         body {
             background: linear-gradient(135deg, #2c003e 0%, #000000 100%);
             color: #ffffff;
-            font-family: 'Comic Sans MS', 'Verdana', sans-serif;
+            font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
             text-align: center;
             padding: 10px;
             margin: 0;
@@ -57,9 +57,9 @@
             top: 15px;
             left: 15px;
             text-decoration: none;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             background: rgba(255, 255, 255, 0.1);
-            padding: 10px 20px;
+            padding: 8px 20px;
             border-radius: 50px;
             border: 3px solid #deaaff;
             color: #deaaff;
@@ -77,7 +77,7 @@
 
         .game-title {
             color: #e0d0ff;
-            font-size: clamp(2rem, 5vw, 3rem);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
             text-shadow: 0 0 15px #b080ff;
             margin: 0;
             z-index: 10;
@@ -91,7 +91,24 @@
             background: rgba(0, 0, 0, 0.4);
             padding: 5px 25px;
             border-radius: 20px;
+            margin-bottom: 0;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
             margin-bottom: 10px;
+        }
+
+        .score-display {
+            font-size: 1.5rem;
+            color: #deaaff;
+            font-weight: bold;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 5px 25px;
+            border-radius: 20px;
         }
 
         /* WORKSPACE */
@@ -162,15 +179,16 @@
         }
 
         .palette-item {
-            width: 60px;
-            height: 60px;
+            width: 50px;
+            height: 50px;
+            margin: 0 5px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid transparent;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.8rem;
             cursor: pointer;
             transition: transform 0.2s;
         }
@@ -224,20 +242,53 @@
         }
 
         .modal-card {
-            background: #fff;
-            color: #333;
-            border: 8px solid #deaaff;
-            padding: 30px;
-            border-radius: 40px;
+            background: radial-gradient(circle at center, #2e004f, #000);
+            color: #fff;
+            border: none;
+            padding: 50px;
+            border-radius: 50% 20% 50% 20%;
+            /* Abstract shape */
             text-align: center;
-            max-width: 600px;
-            width: 90%;
-            animation: popIn 0.4s;
-
-            /* DYSLEXIA FRIENDLY */
-            font-family: 'Comic Sans MS', 'Verdana', sans-serif;
+            max-width: 400px;
+            width: 95%;
+            animation: floatModal 6s ease-in-out infinite;
+            box-shadow: 0 0 60px rgba(180, 100, 255, 0.5);
+            font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
             letter-spacing: 1px;
-            line-height: 1.5;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        /* Sparkles on modal */
+        .modal-card::before {
+            content: "✨";
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 2rem;
+            animation: pulse 2s infinite;
+        }
+
+        .modal-card::after {
+            content: "✨";
+            position: absolute;
+            bottom: 10px;
+            right: 20px;
+            font-size: 1.5rem;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes floatModal {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(1deg);
+            }
         }
 
         @keyframes popIn {
@@ -253,8 +304,8 @@
         }
 
         .modal-title {
-            margin: 0 0 10px 0;
-            font-size: 3rem;
+            margin: 0 0 20px 0;
+            font-size: 2.5rem;
             text-transform: uppercase;
         }
 
@@ -279,6 +330,40 @@
         .modal-btn:active {
             transform: translateY(2px);
             box-shadow: 0 2px 0 #b080ff;
+        }
+
+        .btn-start {
+            margin-top: 30px;
+            padding: 15px 40px;
+            font-size: 1.8rem;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            box-shadow: 0 6px 0 #27ae60;
+            transition: transform 0.1s;
+        }
+
+        .btn-start:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #27ae60;
+        }
+
+        .tutorial-step {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #fff;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         /* Shake Anim for error */
@@ -307,9 +392,18 @@
 <body>
 
     <a href="../galaxy.html" class="btn-back">⬅ POVRATAK</a>
+    <button onclick="showInstructions()"
+        style="position: absolute; top: 15px; right: 15px; background: rgba(222, 170, 255, 0.1); border: 2px solid #deaaff; color: #deaaff; padding: 8px 20px; border-radius: 40px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; z-index: 100;"
+        onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(222, 170, 255, 0.2)'"
+        onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(222, 170, 255, 0.1)'">
+        ❓ UPUTE
+    </button>
 
     <h1 class="game-title">ZVJEZDANA SLAGALICA</h1>
-    <div class="level-display" id="levelDisplay">RAZINA: 1 / 10</div>
+    <div class="stats-row">
+        <div class="level-display" id="levelDisplay">RAZINA: 1 / 10</div>
+        <div id="scoreText" class="score-display">BODOVI: 0</div>
+    </div>
 
     <div class="workspace">
         <!-- LEFT PANEL (MODEL) -->
@@ -333,23 +427,14 @@
     <button class="btn-check" onclick="checkSolution()">PROVJERI ✅</button>
 
 
-    <!-- START MODAL -->
-    <div class="overlay" id="startScreen" style="display: flex;">
+    <!-- TUTORIAL OVERLAY -->
+    <div class="overlay" id="tutorial-overlay" style="display: flex;">
         <div class="modal-card">
-            <h2 class="modal-title" style="color: #9b59b6;">UPUTE</h2>
-
-            <div
-                style="text-align: left; margin: 20px 0; background: rgba(155, 89, 182, 0.1); padding: 20px; border-radius: 15px; color: #333;">
-                <p style="font-size: 1.3rem; margin: 10px 0;">🧩 <strong>MISIJA:</strong> Stvori odraz u ogledalu!</p>
-                <p style="font-size: 1.3rem; margin: 10px 0;">✋ <strong>KAKO:</strong>
-                    <br>1. Odaberi oblik dolje.
-                    <br>2. Klikni na desnu mrežu da ga postaviš.
-                    <br>3. Mora biti simetrično (kao u ogledalu).
-                </p>
-                <p style="font-size: 1.3rem; margin: 10px 0;">🌟 <strong>CILJ:</strong> Riješi 10 zagonetki!</p>
+            <h2 id="tutorial-title" class="modal-title" style="color: #9b59b6;">UPUTE</h2>
+            <div id="tutorial-content" style="text-align: left; margin: 15px 0;">
+                <!-- Content injected by JS -->
             </div>
-
-            <button class="modal-btn" onclick="startGame()" style="background: #9b59b6; color: white;">IGRAJ ▶</button>
+            <button id="tutorial-main-btn" class="btn-start" onclick="closeInstructions()">RAZUMIJEM! 🚀</button>
         </div>
     </div>
 
@@ -358,7 +443,7 @@
         <div class="modal-card" style="border-color: #2ecc71;">
             <h2 class="modal-title" style="color: #2ecc71;">TOČNO! ✅</h2>
             <p style="font-size: 1.5rem;">Savršena simetrija!</p>
-            <button class="modal-btn" onclick="nextLevel()" style="background: #2ecc71; color: white;">DALJE ➡</button>
+            <button class="btn-start" onclick="nextLevel()" style="background: #2ecc71; color: white;">DALJE ➡</button>
         </div>
     </div>
 
@@ -367,8 +452,8 @@
         <div class="modal-card" style="border-color: #ff6b6b;">
             <h2 class="modal-title" style="color: #ff6b6b;">UPS! ❌</h2>
             <p style="font-size: 1.5rem;">Ovo nije točan odraz. Pokušaj ponovo!</p>
-            <button class="modal-btn" onclick="retryLevel()" style="background: #ff6b6b; color: white;">POKUŠAJ PONOVO
-                ↺</button>
+            <button class="btn-start" onclick="retryLevel()"
+                style="background: #ff6b6b; color: white; box-shadow: 0 6px 0 #c0392b;">POKUŠAJ PONOVO ↺</button>
         </div>
     </div>
 
@@ -377,11 +462,12 @@
         <div class="modal-card" style="border-color: #ffd700;">
             <h2 class="modal-title" style="color: #ffd700;">BRAVO! 🏆</h2>
             <p style="font-size: 1.5rem;">Gospodar simetrije! Sve zagonetke riješene.</p>
-            <button class="modal-btn" onclick="startGame()" style="background: #ffd700; color: #333;">IGRAJ PONOVO
-                🎉</button>
+            <button class="btn-start" onclick="startGame()"
+                style="background: #ffd700; color: #333; box-shadow: 0 6px 0 #b45309;">IGRAJ PONOVO 🎉</button>
         </div>
     </div>
 
+    <script src="../../game_storage.js"></script>
     <script>
         // SYMBOLS
         const ITEMS = [
@@ -391,6 +477,19 @@
             { id: 'planet', char: '🪐' },
             { id: 'eraser', char: '❌' } // Special item to clear cell
         ];
+
+        const GAME_ID = 'zvezdana_game';
+        let totalScore = 0;
+        let highScore = 0;
+
+        // Initialize high score safely
+        try {
+            if (typeof GameStorage !== 'undefined') {
+                highScore = GameStorage.getHighScore(GAME_ID);
+            }
+        } catch (e) {
+            console.log("GameStorage not found");
+        }
 
         let currentLevel = 1;
         let leftGridData = [];
@@ -553,6 +652,16 @@
             }
 
             if (correct) {
+                totalScore += 10;
+                document.getElementById('scoreText').innerText = `BODOVI: ${totalScore}`;
+                if (typeof GameStorage !== 'undefined') {
+                    GameStorage.addCredits(10);
+                    if (totalScore > highScore) {
+                        highScore = totalScore;
+                        GameStorage.saveHighScore(GAME_ID, highScore);
+                    }
+                }
+
                 playTone(523, 'triangle', 0.1);
                 setTimeout(() => playTone(659, 'triangle', 0.1), 100);
                 setTimeout(() => playTone(783, 'triangle', 0.2), 200);
@@ -566,6 +675,62 @@
             }
         }
 
+
+        function showInstructions() {
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerText = "🎓 UPUTE";
+            content.innerHTML =
+                `<div class="tutorial-step">🌌 <span><strong style="color:#deaaff">Zadatak:</strong> Stvori odraz u ogledalu!</span>
+    </div>` +
+                `<div class="tutorial-step">👈 <span><strong style="color:#deaaff">Lijevo:</strong> Uzorak koji moraš
+            prekopirati.</span></div>` +
+                `<div class="tutorial-step">👉 <span><strong style="color:#deaaff">Desno:</strong> Tvoja ploča za crtanje.</span>
+    </div>`;
+
+            btn.innerText = "NASTAVI 🚀";
+            btn.onclick = closeInstructions;
+            overlay.style.display = 'flex';
+        }
+
+        function showStartScreen() {
+            const overlay = document.getElementById('tutorial-overlay');
+            const title = document.getElementById('tutorial-title');
+            const content = document.getElementById('tutorial-content');
+            const btn = document.getElementById('tutorial-main-btn');
+
+            title.innerText = "✨ ZVJEZDANI ODRAZ ✨";
+            title.style.color = "#fff";
+            title.style.textShadow = "0 0 20px #deaaff";
+
+            content.innerHTML =
+                `<div class="tutorial-step" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
+                    🌌 <span><strong style="color:#deaaff">IZAZOV:</strong> Dovrši zvjezdanu sliku.</span>
+                 </div>` +
+                `<div class="tutorial-step" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2);">
+                    👆 <span><strong style="color:#deaaff">KAKO:</strong> Stvori odraz u ogledalu.</span>
+                 </div>`;
+
+            btn.innerText = "ZAPLIŠI SA ZVIJEZDAMA 💫";
+            btn.style.background = "linear-gradient(90deg, #9b59b6, #8e44ad)";
+            btn.style.boxShadow = "0 5px 20px rgba(155, 89, 182, 0.5)";
+
+            btn.onclick = () => {
+                closeInstructions();
+                startGame();
+            };
+            overlay.style.display = 'flex';
+        }
+
+        function closeInstructions() {
+            document.getElementById('tutorial-overlay').style.display = 'none';
+        }
+
+        // Init
+        showStartScreen();
     </script>
 </body>
 
