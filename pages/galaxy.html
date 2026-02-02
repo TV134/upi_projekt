@@ -56,10 +56,11 @@
         }
 
         header h1 {
-            font-size: clamp(2.2rem, 8vw, 4rem);
+            font-size: clamp(2rem, 6vw, 3rem);
             color: #ffffff;
             text-shadow: 0 0 30px rgba(162, 155, 254, 0.8);
-            margin-bottom: 30px;
+            margin-bottom: 15px;
+            /* Reduced from 30px */
             letter-spacing: 1px;
         }
 
@@ -68,18 +69,22 @@
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
-            padding: 40px 30px;
+            padding: 20px 10px;
+            /* Reduced padding */
             border-radius: 40px;
             border: 2px solid rgba(162, 155, 254, 0.3);
             box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7);
 
             /* Layout Fixes */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-            max-width: 500px;
+            display: block;
+            text-align: center;
+            max-width: 900px;
+            width: 95%;
             margin: 0 auto;
+            max-height: 75vh;
+            /* Prevent overflow */
+            overflow-y: auto;
+            /* Allow scrolling if needed */
         }
 
         .mission-box h3 {
@@ -96,6 +101,34 @@
             /* Povećan razmak linija za lakše čitanje */
             margin-top: 20px;
             letter-spacing: 0.05em;
+            margin-top: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .game-btn {
+            display: inline-block;
+            width: auto;
+            max-width: 100%;
+            padding: 12px 20px;
+            /* Reduced padding */
+            text-align: center;
+            color: #000;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            /* Reduced font size */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease-in-out;
+            border: none;
+            margin: 8px;
+            /* Reduced margin */
+        }
+
+        .game-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            filter: brightness(1.1);
         }
 
 
@@ -159,29 +192,24 @@
 
         <section class="mission-box">
 
-            <a href="galaksija_igre/orbit_game.html"
-                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #00d2ff; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4); transition: transform 0.2s;"
-                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <a href="galaksija_igre/orbit_game.html" class="game-btn"
+                style="background: #00d2ff; box-shadow: 0 5px 15px rgba(0, 210, 255, 0.4);">
                 Igraj: Svemirska Memorijska Orbita 🪐
             </a>
-            <a href="galaksija_igre/cosmic_game.html"
-                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #ff00ff; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4); transition: transform 0.2s;"
-                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <a href="galaksija_igre/cosmic_game.html" class="game-btn"
+                style="background: #ff00ff; box-shadow: 0 5px 15px rgba(255, 0, 255, 0.4);">
                 Igraj: Kozmička Mreža 🕸️
             </a>
-            <a href="galaksija_igre/detekt_game.html"
-                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #ffd700; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4); transition: transform 0.2s;"
-                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <a href="galaksija_igre/detekt_game.html" class="game-btn"
+                style="background: #ffd700; box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);">
                 Igraj: Kozmički Detektiv 🕵️‍♂️
             </a>
-            <a href="galaksija_igre/titan_game.html"
-                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #ff8c00; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4); transition: transform 0.2s;"
-                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <a href="galaksija_igre/titan_game.html" class="game-btn"
+                style="background: #ff8c00; box-shadow: 0 5px 15px rgba(255, 140, 0, 0.4);">
                 Igraj: Misterij Titana 🌑
             </a>
-            <a href="galaksija_igre/zvezdana_game.html"
-                style="width: 100%; max-width: 400px; padding: 12px 20px; text-align: center; background: #deaaff; color: #000; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; box-shadow: 0 5px 15px rgba(222, 170, 255, 0.4); transition: transform 0.2s;"
-                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <a href="galaksija_igre/zvezdana_game.html" class="game-btn"
+                style="background: #deaaff; box-shadow: 0 5px 15px rgba(222, 170, 255, 0.4);">
                 Igraj: Zvjezdana Slagalica 🧩
             </a>
         </section>
@@ -300,6 +328,7 @@
 
         tick()
     </script>
+    <script src="../astronaut_companion.js"></script>
 </body>
 
 </html>
