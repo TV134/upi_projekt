@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Svemirska Trgovina</title>
+    <link href="https://fonts.cdnfonts.com/css/open-dyslexic" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-color: #050112;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --accent: #ffd700;
+            --text: #ffffff;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            /* Preview vars (defaults) */
+            --preview-suit: #ffffff;
+            --preview-visor: #00d2ff;
+            --preview-eye: #333333;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--bg-color);
+            color: var(--text);
+            font-family: 'OpenDyslexic', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* SIDEBAR (Categories & Wallet) */
+        .sidebar {
+            width: 300px;
+            background: #0f0a20;
+            border-right: 2px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-shadow: 5px 0 20px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .wallet-box {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .wallet-amount {
+            font-size: 2rem;
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 15px;
+            font-size: 1.2rem;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            font-family: inherit;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-btn.active {
+            background: var(--accent);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .back-btn {
+            margin-top: auto;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: radial-gradient(circle at 80% 20%, #201040, #050112);
+        }
+
+        h1 {
+            color: var(--accent);
+            margin-top: 0;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+
+        .item-card {
+            background: var(--card-bg);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .item-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .item-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #333;
+        }
+
+        .item-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-buy {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .btn-buy:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-owned {
+            background: var(--green);
+            color: white;
+            cursor: default;
+        }
+
+        .btn-poor {
+            background: #555;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+        /* SVG PREVIEW OVERLAY */
+        #live-preview {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 250px;
+            height: 300px;
+            pointer-events: none;
+            filter: drop-shadow(0 0 20px rgba(0, 0, 0, 0.5));
+            transition: 0.3s;
+        }
+
+        /* SVG Parts */
+        .suit-part {
+            fill: var(--preview-suit);
+            transition: 0.3s;
+        }
+
+        .visor-part {
+            fill: var(--preview-visor);
+            transition: 0.3s;
+        }
+
+        .eye-part {
+            fill: var(--preview-eye);
+            transition: 0.3s;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            transform: translateY(-100px);
+            transition: 0.3s;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="wallet-box">
+            <div>TVOJI BODOVI</div>
+            <div class="wallet-amount" id="wallet-amount">0</div>
+        </div>
+
+        <button class="nav-btn active" onclick="filter('suits', this)">🚀 Odijela</button>
+        <button class="nav-btn" onclick="filter('visors', this)">💎 Viziri</button>
+        <button class="nav-btn" onclick="filter('eyes', this)">👀 Oči</button>
+        <button class="nav-btn" onclick="filter('hats', this)">🎩 Kape</button>
+
+        <a href="#" class="back-btn" onclick="goBack(); return false;">⬅ NATRAG</a>
+    </aside>
+
+    <script>
+        function goBack() {
+            // Always return to the Design page (Wardrobe)
+            window.location.href = 'design.html';
+        }
+    </script>
+
+    <main class="main-content">
+        <h1 id="category-title">Odijela</h1>
+        <div class="shop-grid" id="shop-grid">
+            <!-- Items injected here -->
+        </div>
+    </main>
+
+    <!-- Floating Astronaut Preview -->
+    <div id="live-preview">
+        <svg width="100%" height="100%" viewBox="0 -50 200 270" xmlns="http://www.w3.org/2000/svg">
+            <!-- Ruksak -->
+            <rect x="60" y="90" width="80" height="90" rx="20" class="suit-part" style="filter: brightness(0.8);" />
+            <!-- Tijelo -->
+            <rect x="65" y="110" width="70" height="85" rx="35" class="suit-part" />
+            <!-- Ručice -->
+            <circle cx="55" cy="140" r="14" class="suit-part" />
+            <circle cx="145" cy="140" r="14" class="suit-part" />
+            <!-- Kaciga -->
+            <circle cx="100" cy="70" r="65" class="suit-part" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+            <!-- Vizir -->
+            <rect x="55" y="45" width="90" height="55" rx="25" class="visor-part" />
+            <!-- Oči -->
+            <circle cx="82" cy="72" r="10" class="eye-part" />
+            <circle cx="118" cy="72" r="10" class="eye-part" />
+            <circle cx="85" cy="68" r="3.5" fill="white" />
+            <circle cx="121" cy="68" r="3.5" fill="white" />
+            <!-- Hat Container -->
+            <g id="preview-hat"></g>
+        </svg>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="notification"></div>
+
+    <script src="../game_storage.js"></script>
+    <script>
+        let currentCategory = 'suits';
+        let userCredits = 0;
+        let ownedItems = [];
+
+        // Preview State
+        const previewState = {
+            suit: '#ffffff',
+            visor: '#00d2ff',
+            eye: '#333333',
+            hat: ''
+        };
+
+        function init() {
+            if (typeof GameStorage === 'undefined') {
+                console.error("GameStorage not found!");
+                return;
+            }
+            // Load user data
+            userCredits = GameStorage.getCredits();
+            ownedItems = GameStorage.getInventory();
+            updateWalletUI();
+
+            // Load preview based on current settings (if any)
+            loadCurrentLook();
+
+            // Render initial
+            renderItems('suits');
+        }
+
+        function loadCurrentLook() {
+            const savedRaw = localStorage.getItem('astro_settings');
+            if (savedRaw) {
+                const saved = JSON.parse(savedRaw);
+                if (saved.suit) setPreview('suit', saved.suit);
+                if (saved.visor) setPreview('visor', saved.visor);
+                if (saved.eye) setPreview('eye', saved.eye);
+                if (saved.hat) setPreview('hat', saved.hat); // Will implement in updated design.html too
+            }
+        }
+
+        function updateWalletUI() {
+            document.getElementById('wallet-amount').innerText = userCredits;
+        }
+
+        function filter(category, btn) {
+            currentCategory = category;
+
+            // Update Title
+            const titles = { 'suits': 'Odijela', 'visors': 'Viziri', 'eyes': 'Oči', 'hats': 'Kape' };
+            document.getElementById('category-title').innerText = titles[category];
+
+            // Update Active Button
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            renderItems(category);
+        }
+
+        function renderItems(category) {
+            const grid = document.getElementById('shop-grid');
+            grid.innerHTML = '';
+
+            const items = GameStorage.ShopData[category];
+
+            items.forEach(item => {
+                const isOwned = ownedItems.includes(item.id);
+                const canAfford = userCredits >= item.price;
+
+                const col = document.createElement('div');
+                col.className = 'item-card';
+                col.onclick = () => previewItem(item); // Preview on click
+
+                // Visual Representation
+                let visual = '';
+                if (item.type === 'hat') {
+                    // Start render small SVG for hat
+                    visual = `<svg width="50" height="50" viewBox="0 0 200 200" style="overflow:visible">${item.path || ''}</svg>`;
+                } else {
+                    visual = `<div style="width:100%; height:100%; border-radius:50%; background:${item.color}"></div>`;
+                }
+
+                // Button State
+                let btnHtml = '';
+                if (isOwned) {
+                    btnHtml = `<button class="buy-btn btn-owned">KUPLJENO ✅</button>`;
+                } else if (canAfford) {
+                    btnHtml = `<button class="buy-btn btn-buy" onclick="buy('${item.id}', event)">KUPI (${item.price})</button>`;
+                } else {
+                    btnHtml = `<button class="buy-btn btn-poor">Nedovoljno 💰 ${item.price}</button>`;
+                }
+
+                col.innerHTML = `
+                    <div class="item-preview" style="${item.type !== 'hat' ? '' : 'background:transparent; border:none;'}">
+                        ${visual}
+                    </div>
+                    <div class="item-name">${item.name}</div>
+                    ${btnHtml}
+                `;
+                grid.appendChild(col);
+            });
+        }
+
+        function previewItem(item) {
+            if (item.type === 'hat') {
+                setPreview('hat', item.path);
+            } else {
+                setPreview(item.type, item.color);
+            }
+        }
+
+        function setPreview(type, value) {
+            if (type === 'hat') {
+                document.getElementById('preview-hat').innerHTML = value || '';
+            } else {
+                document.documentElement.style.setProperty(`--preview-${type}`, value);
+            }
+        }
+
+        function buy(itemId, e) {
+            e.stopPropagation(); // Don't trigger preview again
+
+            const res = GameStorage.buyItem(itemId);
+            if (res.success) {
+                // Determine item type/value to apply immediately if bought? 
+                // Wait, design page handles applying, but we can update UI.
+                userCredits = res.newBalance;
+                updateWalletUI();
+                ownedItems.push(itemId); // Local update
+
+                showToast(res.message, '#2ecc71');
+                renderItems(currentCategory); // Re-render to show "owned"
+            } else {
+                showToast(res.message, '#e74c3c');
+            }
+        }
+
+        function showToast(msg, color) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.background = color;
+            t.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                t.style.transform = 'translateY(-100px)';
+            }, 3000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

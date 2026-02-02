@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="hr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASTRONAUT - ORMAR</title>
+    <!-- OpenDyslexic Font -->
+    <link href="https://fonts.cdnfonts.com/css/open-dyslexic" rel="stylesheet">
+
+    <style>
+        :root {
+            --suit-color: #ffffff;
+            --eye-color: #333333;
+            --visor-color: #00d2ff;
+            /* Nova plavo-ljubičasta tema */
+            --accent: #7000ff;
+            --glow: #00f2ff;
+            --gold: #ffd700;
+        }
+
+        * {
+            font-family: 'OpenDyslexic', sans-serif;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #050112;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            color: white;
+            overflow: hidden;
+            /* Zvijezde u pozadini */
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #fff, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 100px 150px, #fff, rgba(0, 0, 0, 0)),
+                radial-gradient(2px 2px at 200px 80px, #fff, rgba(0, 0, 0, 0));
+            background-size: 300px 300px;
+            animation: stars 20s linear infinite;
+        }
+
+        @keyframes stars {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: 0 1000px;
+            }
+        }
+
+        /* Bočna traka bez kutija koje guše sadržaj */
+        .sidebar {
+            width: 400px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(25px);
+            border-right: 4px solid var(--accent);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            /* Razmak između sekcija */
+            box-shadow: 15px 0 50px rgba(112, 0, 255, 0.2);
+            overflow-y: auto;
+            /* Za svaki slučaj ako je mali ekran */
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            margin: 0;
+            color: var(--glow);
+            text-shadow: 0 0 15px var(--accent);
+            transform: rotate(-1deg);
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #ffd700;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Boje - Krugovi */
+        .color-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .swatch {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .swatch.active {
+            border-color: #fff;
+            box-shadow: 0 0 15px var(--glow);
+            transform: scale(1.1);
+        }
+
+        .swatch:hover {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        /* Unos Imena */
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 15px;
+            border: 3px solid var(--accent);
+            font-size: 1.2rem;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #1a0033;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2);
+        }
+
+        .counter {
+            font-size: 0.8rem;
+            text-align: right;
+            margin-top: 8px;
+            color: var(--glow);
+        }
+
+        /* Glavni prikaz */
+        .preview {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, rgba(112, 0, 255, 0.1) 0%, transparent 70%);
+        }
+
+        .astro-animation {
+            animation: space-float 5s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(112, 0, 255, 0.3));
+        }
+
+        @keyframes space-float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(1deg);
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(-1deg);
+            }
+        }
+
+        #badge {
+            margin-top: 40px;
+            background: var(--accent);
+            color: white;
+            padding: 12px 50px;
+            border-radius: 40px;
+            font-size: 2rem;
+            border: 4px solid var(--glow);
+            box-shadow: 0 10px 0 #4a00a8;
+            transform: rotate(1deg);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* SVG Elementi */
+        .suit-part {
+            fill: var(--suit-color);
+            transition: 0.4s;
+        }
+
+        .eye-part {
+            fill: var(--eye-color);
+            transition: 0.4s;
+        }
+
+        .visor-part {
+            fill: var(--visor-color);
+            transition: 0.4s;
+        }
+
+        .buy-link {
+            font-size: 0.8rem;
+            background: var(--green);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation Container -->
+    <div
+        style="position: absolute; top: 15px; width: 100%; display: flex; justify-content: center; gap: 20px; z-index: 100;">
+        <a href="../index.html"
+            style="text-decoration: none; font-size: 1rem; background: rgba(255, 255, 255, 0.1); padding: 8px 15px; border-radius: 30px; border: 1px solid #7000ff; color: #00f2ff; transition: 0.2s; box-shadow: 0 0 10px rgba(112, 0, 255, 0.3); font-weight: bold;"
+            onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
+            🏠 POČETNA
+        </a>
+
+        <a href="shop.html"
+            style="text-decoration: none; font-size: 1rem; background: #ffd700; padding: 8px 15px; border-radius: 30px; border: 1px solid #e1b700; color: #000; transition: 0.2s; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); font-weight: bold;"
+            onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            🛍️ TRGOVINA
+        </a>
+
+        <a href="choice.html"
+            style="text-decoration: none; font-size: 1rem; background: rgba(255, 255, 255, 0.1); padding: 8px 15px; border-radius: 30px; border: 1px solid #7000ff; color: #00f2ff; transition: 0.2s; box-shadow: 0 0 10px rgba(112, 0, 255, 0.3); font-weight: bold;"
+            onmouseover="this.style.transform='scale(1.05)'; this.style.background='rgba(255, 255, 255, 0.2)'"
+            onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(255, 255, 255, 0.1)'">
+            🗺️ DESTINACIJA
+        </a>
+    </div>
+
+    <aside class="sidebar">
+        <h1>TVOJ OPREMA</h1>
+
+        <!-- Sekcije generated by JS -->
+        <div class="section">
+            <div class="label">
+                <span>🎩 Kape</span>
+            </div>
+            <div class="color-grid" id="grid-hats"></div>
+        </div>
+
+        <div class="section">
+            <div class="label">
+                <span>🚀 Boja Odijela</span>
+            </div>
+            <div class="color-grid" id="grid-suits"></div>
+        </div>
+
+        <div class="section">
+            <div class="label">
+                <span>💎 Vizir</span>
+            </div>
+            <div class="color-grid" id="grid-visors"></div>
+        </div>
+
+        <div class="section">
+            <div class="label">
+                <span>👀 Oči</span>
+            </div>
+            <div class="color-grid" id="grid-eyes"></div>
+        </div>
+
+        <!-- Sekcija: Spremi Dizajn -->
+        <div class="section" style="padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <button onclick="saveDesign()" style="
+                background: linear-gradient(135deg, #FFD166, #FF9F1C);
+                border: none;
+                color: #000;
+                width: 100%;
+                padding: 12px;
+                border-radius: 15px;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 1rem;
+                box-shadow: 0 5px 15px rgba(255, 159, 28, 0.4);
+                transition: 0.3s;
+            " onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                🎨 SPREMI PROMJENE
+            </button>
+        </div>
+
+        <!-- Sekcija: Ime -->
+        <div class="section">
+            <span class="label">✍️ Tvoje Ime</span>
+            <input type="text" id="nameInput" placeholder="Samo slova..." maxlength="12">
+            <div class="counter"><span id="count">0</span> / 12</div>
+
+            <button onclick="saveProfile()" style="
+                margin-top: 15px;
+                background: linear-gradient(135deg, var(--glow), var(--accent));
+                border: none;
+                color: white;
+                width: 100%;
+                padding: 15px;
+                border-radius: 15px;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 1.1rem;
+                box-shadow: 0 5px 15px rgba(112, 0, 255, 0.4);
+                transition: 0.3s;
+            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 20px rgba(112, 0, 255, 0.6)'"
+                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 15px rgba(112, 0, 255, 0.4)'">
+                💾 SAČUVAJ PROFIL
+            </button>
+
+        </div>
+
+        <!-- Sekcija: Opcije -->
+        <div class="section">
+            <span class="label">⚠️ Opcije</span>
+            <button onclick="deleteAllCookies()" style="
+                    background: rgba(255, 0, 0, 0.2); 
+                    border: 2px solid #ff4444; 
+                    color: #ff4444; 
+                    width: 100%; 
+                    padding: 10px; 
+                    border-radius: 10px; 
+                    cursor: pointer; 
+                    font-weight: bold;
+                    transition: 0.3s;
+                " onmouseover="this.style.background='rgba(255, 0, 0, 0.4)'"
+                onmouseout="this.style.background='rgba(255, 0, 0, 0.2)'">
+                🗑️ Obriši Profil
+            </button>
+        </div>
+    </aside>
+
+    <main class="preview">
+        <div class="astro-animation">
+            <svg width="400" height="400" viewBox="0 -50 200 270" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ruksak -->
+                <rect x="60" y="90" width="80" height="90" rx="20" class="suit-part" style="filter: brightness(0.8);" />
+
+                <!-- Tijelo -->
+                <rect x="65" y="110" width="70" height="85" rx="35" class="suit-part" />
+
+                <!-- Ručice -->
+                <circle cx="55" cy="140" r="14" class="suit-part" />
+                <circle cx="145" cy="140" r="14" class="suit-part" />
+
+                <!-- Kaciga -->
+                <circle cx="100" cy="70" r="65" class="suit-part" stroke="rgba(255,255,255,0.1)" stroke-width="2" />
+
+                <!-- Vizir -->
+                <rect x="55" y="45" width="90" height="55" rx="25" class="visor-part" />
+
+                <!-- VELIKE OČI -->
+                <circle cx="82" cy="72" r="10" class="eye-part" />
+                <circle cx="118" cy="72" r="10" class="eye-part" />
+
+                <!-- Sjaj u očima -->
+                <circle cx="85" cy="68" r="3.5" fill="white" />
+                <circle cx="121" cy="68" r="3.5" fill="white" />
+
+                <!-- Nožice -->
+                <rect x="70" y="190" width="25" height="15" rx="7" fill="#111" />
+                <rect x="105" y="190" width="25" height="15" rx="7" fill="#111" />
+
+                <!-- Sjaj na viziru -->
+                <path d="M70 50 Q100 40 130 50" stroke="white" stroke-width="4" stroke-linecap="round" fill="none"
+                    opacity="0.3" />
+
+                <!-- HAT CONTAINER -->
+                <g id="hat-container"></g>
+            </svg>
+        </div>
+
+        <div id="badge">ASTRONAUT</div>
+    </main>
+
+    <script src="../game_storage.js"></script>
+    <script>
+        // State variables
+        let owned = [];
+        let currentState = {
+            suit: '#ffffff',
+            visor: '#00d2ff',
+            eye: '#333333',
+            hat: '' // Hat path
+        };
+
+        function init() {
+            if (typeof GameStorage !== 'undefined') {
+                owned = GameStorage.getInventory();
+            } else {
+                console.warn("GameStorage unavailable, loading defaults");
+                // Fallback default
+            }
+
+            loadState();
+            renderWardrobe();
+        }
+
+        // Render grids based on owned items
+        function renderWardrobe() {
+            const categories = [
+                { id: 'suits', grid: 'grid-suits', prop: 'color' },
+                { id: 'visors', grid: 'grid-visors', prop: 'color' },
+                { id: 'eyes', grid: 'grid-eyes', prop: 'color' },
+                { id: 'hats', grid: 'grid-hats', prop: 'path' }
+            ];
+
+            categories.forEach(cat => {
+                const container = document.getElementById(cat.grid);
+                container.innerHTML = '';
+
+                // Filter owned items for this category
+                const items = GameStorage.ShopData[cat.id].filter(i => owned.includes(i.id));
+
+                items.forEach(item => {
+                    const el = document.createElement('div');
+                    el.className = 'swatch';
+
+                    if (cat.id === 'hats') {
+                        // Render mini SVG for hat
+                        el.innerHTML = `<svg width="30" height="30" viewBox="0 0 200 200" style="overflow:visible">${item.path || ''}</svg>`;
+                        el.onclick = () => changeHat(item.path);
+                    } else {
+                        // Color circle
+                        el.style.background = item.color;
+                        let typeKey = cat.id.slice(0, -1); // suits -> suit
+                        el.onclick = () => changeColor(typeKey, item.color);
+                    }
+                    container.appendChild(el);
+                });
+            });
+        }
+
+        // Učitavanje stanja
+        function loadState() {
+            const saved = localStorage.getItem('astro_settings');
+            if (saved) {
+                const data = JSON.parse(saved);
+                if (data.name) {
+                    nameIn.value = data.name;
+                    updateNameUI(data.name);
+                }
+
+                if (data.suit) changeColor('suit', data.suit);
+                if (data.visor) changeColor('visor', data.visor);
+                if (data.eye) changeColor('eye', data.eye);
+                if (data.hat) changeHat(data.hat);
+            }
+        }
+
+        function changeColor(part, color) {
+            document.documentElement.style.setProperty(`--${part}-color`, color);
+            currentState[part] = color;
+            saveState();
+        }
+
+        function changeHat(path) {
+            document.getElementById('hat-container').innerHTML = path || '';
+            currentState.hat = path;
+            saveState();
+        }
+
+        // Spremanje stanja
+        function saveState() {
+            const data = {
+                ...currentState,
+                name: nameIn.value
+            };
+            localStorage.setItem('astro_settings', JSON.stringify(data));
+        }
+
+        // Upravljanje imenom
+        const nameIn = document.getElementById('nameInput');
+
+        function updateNameUI(val) {
+            document.getElementById('count').innerText = val.length;
+            document.getElementById('badge').innerText = val.toUpperCase() || "ASTRO";
+            document.getElementById('count').style.color = val.length >= 12 ? "#ffd700" : "#00f2ff";
+        }
+
+        nameIn.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/[^a-zA-ZčćžšđČĆŽŠĐ ]/g, '');
+            if (val.length > 12) val = val.substring(0, 12);
+            e.target.value = val;
+            updateNameUI(val);
+            // saveState() removed to prevent auto-save on typing
+        });
+
+        function saveProfile() {
+            if (nameIn.value.trim() === "") {
+                alert("Molim te unesi svoje ime!");
+                return;
+            }
+            saveState();
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "✅ PROFIL SAČUVAN!";
+            btn.style.background = "#2ecc71";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "";
+            }, 2000);
+        }
+
+        function saveDesign() {
+            saveState();
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "✅ DIZAJN SPREMLJEN!";
+            btn.style.background = "#2ecc71";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "linear-gradient(135deg, #FFD166, #FF9F1C)";
+            }, 2000);
+        }
+
+        // Brisanje kolačića (Reset)
+        function deleteAllCookies() {
+            if (confirm("Jesi li siguran da želiš obrisati sve?")) {
+                GameStorage.resetProfileProgress();
+                localStorage.removeItem('astro_settings');
+                location.reload();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>
